@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Frutería Alicia · Pedidos</title>
+<style>
+  :root{
+    --green:#2e7d32;
+    --green-light:#66bb6a;
+    --yellow:#f9a825;
+    --orange:#f4511e;
+    --bg:#fffef7;
+    --card:#ffffff;
+    --ink:#33291f;
+    --muted:#7a6d5c;
+    --line:#eadfce;
+    --shadow:0 2px 10px rgba(120,90,30,.12);
+    --cat-frutas:#f4511e;
+    --cat-verduras:#2e7d32;
+    --cat-lacteos:#1e88e5;
+    --cat-abarrotes:#8d6e63;
+    --cat-bebidas:#00acc1;
+    --cat-botanas:#f9a825;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding-bottom:150px;
+    line-height:1.4;
+  }
+  /* Header */
+  header{
+    background:linear-gradient(135deg,var(--green) 0%,var(--green-light) 60%,var(--yellow) 130%);
+    color:#fff;
+    padding:16px 16px 12px;
+    box-shadow:var(--shadow);
+    position:relative;
+  }
+  header h1{margin:0;font-size:22px;letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
+  header p{margin:4px 0 0;font-size:13px;opacity:.92;}
+  #langBtn{
+    position:absolute;top:14px;right:14px;
+    background:rgba(255,255,255,.22);
+    border:1px solid rgba(255,255,255,.55);
+    color:#fff;border-radius:20px;
+    padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;
+  }
+  #langBtn:active{transform:scale(.95);}
+  /* Tabs */
+  #tabs{
+    position:sticky;top:0;z-index:30;
+    background:var(--bg);
+    display:flex;gap:8px;overflow-x:auto;
+    padding:10px 12px;
+    box-shadow:0 3px 8px rgba(120,90,30,.08);
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  #tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    flex:0 0 auto;
+    border:none;border-radius:22px;
+    padding:9px 16px;font-size:15px;font-weight:700;
+    color:#fff;opacity:.55;cursor:pointer;
+    transition:opacity .15s,transform .1s;
+    white-space:nowrap;
+  }
+  .tab.active{opacity:1;box-shadow:var(--shadow);}
+  .tab:active{transform:scale(.96);}
+  /* Product grid */
+  main{padding:12px;}
+  .cat-title{font-size:18px;font-weight:800;margin:14px 4px 8px;display:flex;align-items:center;gap:8px;}
+  .cat-dot{width:12px;height:12px;border-radius:50%;}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+  }
+  .card{
+    background:var(--card);
+    border:2px solid var(--line);
+    border-radius:16px;
+    padding:12px 10px 10px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s,transform .1s,box-shadow .15s;
+    position:relative;
+    overflow:hidden;
+  }
+  .card:active{transform:scale(.98);}
+  .card.selected{border-color:var(--green);box-shadow:var(--shadow);}
+  .card .emoji{font-size:38px;line-height:1;}
+  .card .name{font-size:15px;font-weight:700;margin-top:6px;min-height:36px;display:flex;align-items:center;justify-content:center;}
+  .card .price{font-size:15px;font-weight:800;color:var(--orange);margin-top:2px;}
+  .card .unit{font-size:12px;color:var(--muted);}
+  .badge{
+    position:absolute;top:6px;right:6px;
+    background:var(--green);color:#fff;
+    min-width:22px;height:22px;border-radius:11px;
+    font-size:12px;font-weight:800;
+    display:none;align-items:center;justify-content:center;padding:0 6px;
+  }
+  .card.selected .badge{display:flex;}
+  /* Qty controls */
+  .qty{
+    margin-top:10px;
+    display:none;
+    align-items:center;justify-content:center;gap:8px;
+  }
+  .card.selected .qty{display:flex;}
+  .qbtn{
+    width:34px;height:34px;border-radius:50%;
+    border:none;background:var(--green-light);color:#fff;
+    font-size:20px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .qbtn:active{transform:scale(.9);}
+  .qty input{
+    width:62px;text-align:center;
+    font-size:16px;font-weight:700;
+    border:2px solid var(--line);border-radius:10px;
+    padding:6px 2px;
+    -moz-appearance:textfield;
+  }
+  .qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .line-total{font-size:12px;color:var(--muted);margin-top:4px;display:none;}
+  .card.selected .line-total{display:block;}
+  /* Bottom bar */
+  #bottomBar{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:#fff;
+    border-top:2px solid var(--line);
+    box-shadow:0 -4px 14px rgba(120,90,30,.14);
+    padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+    display:flex;align-items:center;gap:12px;
+  }
+  #totalWrap{flex:1;}
+  #totalWrap .lbl{font-size:12px;color:var(--muted);}
+  #totalWrap .amt{font-size:24px;font-weight:900;color:var(--green);}
+  #totalWrap .items{font-size:12px;color:var(--muted);}
+  #sendBtn{
+    background:#25D366;color:#fff;border:none;border-radius:14px;
+    padding:14px 18px;font-size:16px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;gap:8px;
+    box-shadow:var(--shadow);
+  }
+  #sendBtn:disabled{background:#bdbdbd;cursor:not-allowed;box-shadow:none;}
+  #sendBtn:active:not(:disabled){transform:scale(.97);}
+  /* Modal / form */
+  #overlay{
+    position:fixed;inset:0;z-index:50;
+    background:rgba(40,30,15,.5);
+    display:none;align-items:flex-end;justify-content:center;
+  }
+  #overlay.open{display:flex;}
+  #formSheet{
+    background:#fff;width:100%;max-width:520px;
+    border-radius:20px 20px 0 0;
+    padding:18px 18px calc(20px + env(safe-area-inset-bottom));
+    max-height:92vh;overflow-y:auto;
+    animation:slideUp .25s ease;
+  }
+  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  #formSheet h2{margin:0 0 4px;font-size:20px;}
+  #formSheet .sub{font-size:13px;color:var(--muted);margin:0 0 14px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:14px;font-weight:700;margin-bottom:4px;}
+  .field .req{color:var(--orange);}
+  .field input,.field textarea,.field select{
+    width:100%;font-size:16px;
+    border:2px solid var(--line);border-radius:12px;
+    padding:12px;font-family:inherit;background:#fff;
+  }
+  .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--green-light);}
+  .field textarea{resize:vertical;min-height:56px;}
+  .pay{display:flex;gap:8px;}
+  .pay label{
+    flex:1;text-align:center;border:2px solid var(--line);border-radius:12px;
+    padding:12px 6px;font-size:14px;font-weight:700;cursor:pointer;margin:0;
+  }
+  .pay input{display:none;}
+  .pay input:checked + span{color:var(--green);}
+  .pay label:has(input:checked){border-color:var(--green);background:#f1f8e9;}
+  #orderSummary{
+    background:#fbf7ec;border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;margin-bottom:14px;font-size:14px;max-height:180px;overflow-y:auto;
+  }
+  #orderSummary .row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--line);}
+  #orderSummary .row:last-child{border-bottom:none;}
+  #orderSummary .tot{font-weight:900;color:var(--green);padding-top:6px;}
+  .sheet-actions{display:flex;gap:10px;margin-top:6px;}
+  #cancelBtn{
+    flex:0 0 auto;background:#f0e9db;color:var(--ink);border:none;border-radius:14px;
+    padding:14px 16px;font-size:16px;font-weight:700;cursor:pointer;
+  }
+  #confirmBtn{
+    flex:1;background:#25D366;color:#fff;border:none;border-radius:14px;
+    padding:14px;font-size:16px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  #confirmBtn:active{transform:scale(.98);}
+  .err{border-color:var(--orange)!important;}
+  .empty-note{text-align:center;color:var(--muted);font-size:14px;padding:20px;}
+  footer{text-align:center;font-size:12px;color:var(--muted);padding:16px;}
+</style>
+</head>
+<body>
+
+<header>
+  <button id="langBtn" onclick="toggleLang()">EN</button>
+  <h1>🍉 Frutería Alicia</h1>
+  <p data-es="Frescura de Mazatlán a tu puerta 🌴" data-en="Freshness from Mazatlán to your door 🌴">Frescura de Mazatlán a tu puerta 🌴</p>
+</header>
+
+<nav id="tabs"></nav>
+<main id="catalog"></main>
+<footer data-es="Pedidos por WhatsApp · Mazatlán, Sinaloa" data-en="Orders via WhatsApp · Mazatlán, Sinaloa">Pedidos por WhatsApp · Mazatlán, Sinaloa</footer>
+
+<div id="bottomBar">
+  <div id="totalWrap">
+    <div class="lbl" data-es="Total del pedido" data-en="Order total">Total del pedido</div>
+    <div class="amt" id="totalAmt">$0.00</div>
+    <div class="items" id="itemCount" data-es="0 productos" data-en="0 items">0 productos</div>
+  </div>
+  <button id="sendBtn" onclick="openForm()" disabled>
+    <span>📲</span><span data-es="Enviar Pedido" data-en="Send Order">Enviar Pedido</span>
+  </button>
+</div>
+
+<div id="overlay">
+  <div id="formSheet">
+    <h2 data-es="Completa tu pedido" data-en="Complete your order">Completa tu pedido</h2>
+    <p class="sub" data-es="Revisa y llena tus datos para enviar por WhatsApp." data-en="Review and fill in your details to send via WhatsApp.">Revisa y llena tus datos para enviar por WhatsApp.</p>
+
+    <div id="orderSummary"></div>
+
+    <div class="field">
+      <label data-es="Nombre" data-en="Name">Nombre</label><span class="req">*</span>
+      <input type="text" id="fName" autocomplete="name" placeholder="...">
+    </div>
+    <div class="field">
+      <label data-es="Teléfono" data-en="Phone">Teléfono</label><span class="req">*</span>
+      <input type="tel" id="fPhone" autocomplete="tel" inputmode="tel" placeholder="669...">
+    </div>
+    <div class="field">
+      <label data-es="Dirección" data-en="Address">Dirección</label>
+      <input type="text" id="fAddr" autocomplete="street-address" placeholder="...">
+    </div>
+    <div class="field">
+      <label data-es="Notas" data-en="Notes">Notas</label>
+      <textarea id="fNotes" placeholder="..."></textarea>
+    </div>
+    <div class="field">
+      <label data-es="Método de pago" data-en="Payment method">Método de pago</label>
+      <div class="pay">
+        <label><input type="radio" name="pay" value="Efectivo" checked><span data-es="Efectivo" data-en="Cash">Efectivo</span></label>
+        <label><input type="radio" name="pay" value="Transferencia"><span data-es="Transferencia" data-en="Transfer">Transferencia</span></label>
+        <label><input type="radio" name="pay" value="Tarjeta"><span data-es="Tarjeta" data-en="Card">Tarjeta</span></label>
+      </div>
+    </div>
+
+    <div class="sheet-actions">
+      <button id="cancelBtn" onclick="closeForm()" data-es="Volver" data-en="Back">Volver</button>
+      <button id="confirmBtn" onclick="submitOrder()">
+        <span>✅</span><span data-es="Confirmar y enviar" data-en="Confirm & send">Confirmar y enviar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- CONFIG ---------- */
+const SHOP_PHONE = "5216691234567"; // WhatsApp destino (MX 52 + 1 + número) — cambiar por el real
+const CURRENCY = "$";
+
+const CATEGORIES = [
+  {id:"frutas",    es:"Frutas",    en:"Fruits",     color:"var(--cat-frutas)"},
+  {id:"verduras",  es:"Verduras",  en:"Vegetables", color:"var(--cat-verduras)"},
+  {id:"lacteos",   es:"Lácteos",   en:"Dairy",      color:"var(--cat-lacteos)"},
+  {id:"abarrotes", es:"Abarrotes", en:"Groceries",  color:"var(--cat-abarrotes)"},
+  {id:"bebidas",   es:"Bebidas",   en:"Drinks",     color:"var(--cat-bebidas)"},
+  {id:"botanas",   es:"Botanas",   en:"Snacks",     color:"var(--cat-botanas)"},
+];
+
+// unit: "kg" (decimal) | "pza" (whole)
+const PRODUCTS = [
+  // FRUTAS
+  {cat:"frutas", es:"Aguacate",       en:"Avocado",        emoji:"🥑", unit:"kg", price:65},
+  {cat:"frutas", es:"Limón",          en:"Lime",           emoji:"🍋", unit:"kg", price:35},
+  {cat:"frutas", es:"Manzana Roja",   en:"Red Apple",      emoji:"🍎", unit:"kg", price:45},
+  {cat:"frutas", es:"Manzana Verde",  en:"Green Apple",    emoji:"🍏", unit:"kg", price:42},
+  {cat:"frutas", es:"Naranja",        en:"Orange",         emoji:"🍊", unit:"kg", price:28},
+  {cat:"frutas", es:"Plátano",        en:"Banana",         emoji:"🍌", unit:"kg", price:22},
+  {cat:"frutas", es:"Mango Ataulfo",  en:"Ataulfo Mango",  emoji:"🥭", unit:"kg", price:55},
+  {cat:"frutas", es:"Papaya",         en:"Papaya",         emoji:"🫐", unit:"kg", price:35},
+  {cat:"frutas", es:"Piña",           en:"Pineapple",      emoji:"🍍", unit:"kg", price:30},
+  {cat:"frutas", es:"Fresa",          en:"Strawberry",     emoji:"🍓", unit:"kg", price:80},
+  {cat:"frutas", es:"Uva Verde",      en:"Green Grape",    emoji:"🍇", unit:"kg", price:90},
+  // VERDURAS
+  {cat:"verduras", es:"Cebolla Blanca",  en:"White Onion",   emoji:"🧅", unit:"kg",  price:25},
+  {cat:"verduras", es:"Cilantro",        en:"Cilantro",      emoji:"🌿", unit:"pza", price:10},
+  {cat:"verduras", es:"Jitomate",        en:"Tomato",        emoji:"🍅", unit:"kg",  price:38},
+  {cat:"verduras", es:"Lechuga",         en:"Lettuce",       emoji:"🥬", unit:"pza", price:18},
+  {cat:"verduras", es:"Papa",            en:"Potato",        emoji:"🥔", unit:"kg",  price:30},
+  {cat:"verduras", es:"Zanahoria",       en:"Carrot",        emoji:"🥕", unit:"kg",  price:28},
+  {cat:"verduras", es:"Chile Serrano",   en:"Serrano Pepper",emoji:"🌶️", unit:"kg",  price:45},
+  {cat:"verduras", es:"Chile Jalapeño",  en:"Jalapeño",      emoji:"🌶️", unit:"kg",  price:40},
+  {cat:"verduras", es:"Cebolla Morada",  en:"Red Onion",     emoji:"🧅", unit:"kg",  price:30},
+  {cat:"verduras", es:"Nopal",           en:"Cactus Paddle", emoji:"🌵", unit:"kg",  price:20},
+  {cat:"verduras", es:"Elote",           en:"Corn Cob",      emoji:"🌽", unit:"pza", price:12},
+  {cat:"verduras", es:"Tomate Verde",    en:"Tomatillo",     emoji:"🟢", unit:"kg",  price:35},
+  {cat:"verduras", es:"Calabacita",      en:"Zucchini",      emoji:"🥒", unit:"kg",  price:28},
+  {cat:"verduras", es:"Pepino",          en:"Cucumber",      emoji:"🥒", unit:"kg",  price:25},
+  // LÁCTEOS
+  {cat:"lacteos", es:"Huevo San Juan",  en:"Eggs (San Juan)", emoji:"🥚", unit:"pza", price:62},
+  {cat:"lacteos", es:"Leche Lala 1L",   en:"Milk Lala 1L",    emoji:"🥛", unit:"pza", price:28},
+  {cat:"lacteos", es:"Queso Fresco",    en:"Fresh Cheese",    emoji:"🧀", unit:"kg",  price:120},
+  {cat:"lacteos", es:"Yogurt Natural",  en:"Plain Yogurt",    emoji:"🥣", unit:"pza", price:25},
+  {cat:"lacteos", es:"Crema",           en:"Cream",           emoji:"🍶", unit:"kg",  price:90},
+  {cat:"lacteos", es:"Mantequilla",     en:"Butter",          emoji:"🧈", unit:"pza", price:35},
+  // ABARROTES
+  {cat:"abarrotes", es:"Aceite",              en:"Cooking Oil",    emoji:"🛢️", unit:"pza", price:42},
+  {cat:"abarrotes", es:"Arroz",               en:"Rice",           emoji:"🍚", unit:"kg",  price:24},
+  {cat:"abarrotes", es:"Azúcar",              en:"Sugar",          emoji:"🍬", unit:"kg",  price:28},
+  {cat:"abarrotes", es:"Frijol",              en:"Beans",          emoji:"🫘", unit:"kg",  price:35},
+  {cat:"abarrotes", es:"Pan Bimbo",           en:"Bread (Bimbo)",  emoji:"🍞", unit:"pza", price:35},
+  {cat:"abarrotes", es:"Tortillas de Harina", en:"Flour Tortillas",emoji:"🫓", unit:"pza", price:22},
+  {cat:"abarrotes", es:"Salsa Valentina",     en:"Valentina Sauce",emoji:"🌶️", unit:"pza", price:18},
+  {cat:"abarrotes", es:"Atún",                en:"Canned Tuna",    emoji:"🐟", unit:"pza", price:25},
+  {cat:"abarrotes", es:"Mayonesa",            en:"Mayonnaise",     emoji:"🥫", unit:"pza", price:32},
+  // BEBIDAS
+  {cat:"bebidas", es:"Agua Bonafont 1L", en:"Bonafont Water 1L", emoji:"💧", unit:"pza", price:15},
+  {cat:"bebidas", es:"Cerveza Modelo",   en:"Modelo Beer",       emoji:"🍺", unit:"pza", price:18},
+  {cat:"bebidas", es:"Coca Cola 2L",     en:"Coca Cola 2L",      emoji:"🥤", unit:"pza", price:32},
+  {cat:"bebidas", es:"Agua de Coco",     en:"Coconut Water",     emoji:"🥥", unit:"pza", price:25},
+  {cat:"bebidas", es:"Horchata 1L",      en:"Horchata 1L",       emoji:"🧉", unit:"pza", price:22},
+  {cat:"bebidas", es:"Jamaica 1L",       en:"Hibiscus 1L",       emoji:"🌺", unit:"pza", price:22},
+  // BOTANAS
+  {cat:"botanas", es:"Galletas Marías", en:"María Cookies", emoji:"🍪", unit:"pza", price:18},
+  {cat:"botanas", es:"Sabritas",        en:"Potato Chips",  emoji:"🥔", unit:"pza", price:23},
+  {cat:"botanas", es:"Chicharrón",      en:"Pork Rinds",    emoji:"🍥", unit:"pza", price:15},
+  {cat:"botanas", es:"Cacahuate",       en:"Peanuts",       emoji:"🥜", unit:"pza", price:12},
+];
+
+/* ---------- STATE ---------- */
+let LANG = "es";
+const cart = {}; // key -> qty (number)
+PRODUCTS.forEach((p,i)=>p._id=i);
+
+const T = {
+  es:{items:n=>`${n} ${n===1?"producto":"productos"}`, kg:"por kg", pza:"por pza", need:"Por favor completa Nombre y Teléfono."},
+  en:{items:n=>`${n} ${n===1?"item":"items"}`, kg:"per kg", pza:"per pc", need:"Please fill in Name and Phone."},
+};
+
+/* ---------- RENDER ---------- */
+function money(n){ return CURRENCY + n.toFixed(2); }
+
+function buildTabs(){
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = "";
+  CATEGORIES.forEach((c,idx)=>{
+    const b = document.createElement("button");
+    b.className = "tab" + (idx===0?" active":"");
+    b.style.background = c.color;
+    b.dataset.target = "cat-"+c.id;
+    b.textContent = LANG==="es"?c.es:c.en;
+    b.onclick = ()=>{
+      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+      b.classList.add("active");
+      const el = document.getElementById("cat-"+c.id);
+      const tabsH = nav.offsetHeight;
+      const y = el.getBoundingClientRect().top + window.scrollY - tabsH - 8;
+      window.scrollTo({top:y, behavior:"smooth"});
+    };
+    nav.appendChild(b);
+  });
+}
+
+function buildCatalog(){
+  const main = document.getElementById("catalog");
+  main.innerHTML = "";
+  CATEGORIES.forEach(c=>{
+    const section = document.createElement("section");
+    section.id = "cat-"+c.id;
+    const title = document.createElement("div");
+    title.className = "cat-title";
+    title.innerHTML = `<span class="cat-dot" style="background:${c.color}"></span>${LANG==="es"?c.es:c.en}`;
+    section.appendChild(title);
+
+    const grid = document.createElement("div");
+    grid.className = "grid";
+    PRODUCTS.filter(p=>p.cat===c.id).forEach(p=>{
+      grid.appendChild(makeCard(p));
+    });
+    section.appendChild(grid);
+    main.appendChild(section);
+  });
+}
+
+function makeCard(p){
+  const card = document.createElement("div");
+  card.className = "card";
+  card.id = "card-"+p._id;
+  const name = LANG==="es"?p.es:p.en;
+  const unitLbl = p.unit==="kg" ? T[LANG].kg : T[LANG].pza;
+  card.innerHTML = `
+    <div class="badge" id="badge-${p._id}"></div>
+    <div class="emoji">${p.emoji}</div>
+    <div class="name">${name}</div>
+    <div class="price">${money(p.price)}</div>
+    <div class="unit">${unitLbl}</div>
+    <div class="qty">
+      <button class="qbtn" data-act="dec">−</button>
+      <input type="text" inputmode="decimal" id="qin-${p._id}" value="">
+      <button class="qbtn" data-act="inc">+</button>
+    </div>
+    <div class="line-total" id="lt-${p._id}"></div>
+  `;
+  // select on card tap (not on controls)
+  card.addEventListener("click",(e)=>{
+    if(e.target.closest(".qty")) return;
+    if(cart[p._id]===undefined) setQty(p, defaultStep(p));
+    else { // toggle off
+      removeItem(p);
+    }
+  });
+  card.querySelector('[data-act="inc"]').addEventListener("click",()=>step(p,+1));
+  card.querySelector('[data-act="dec"]').addEventListener("click",()=>step(p,-1));
+  const input = card.querySelector("input");
+  input.addEventListener("input",()=>onType(p,input));
+  input.addEventListener("blur",()=>normalize(p,input));
+  return card;
+}
+
+function defaultStep(p){ return p.unit==="kg" ? 0.5 : 1; }
+
+function step(p,dir){
+  const cur = cart[p._id] ?? 0;
+  const inc = p.unit==="kg" ? 0.5 : 1;
+  let next = Math.round((cur + dir*inc)*100)/100;
+  if(next<=0){ removeItem(p); return; }
+  setQty(p,next);
+}
+
+function onType(p,input){
+  let raw = input.value.replace(",",".");
+  if(p.unit==="pza") raw = raw.replace(/[^\d]/g,"");
+  else raw = raw.replace(/[^\d.]/g,"");
+  input.value = raw;
+  const val = parseFloat(raw);
+  if(!isNaN(val) && val>0){
+    cart[p._id] = p.unit==="pza" ? Math.floor(val) : val;
+    refreshLine(p); refreshTotals();
+  } else if(raw===""){
+    // leave; will normalize on blur
+  }
+}
+
+function normalize(p,input){
+  const val = parseFloat(input.value.replace(",","."));
+  if(isNaN(val) || val<=0){ removeItem(p); return; }
+  setQty(p, p.unit==="pza"?Math.floor(val):Math.round(val*100)/100);
+}
+
+function setQty(p,qty){
+  cart[p._id]=qty;
+  const card=document.getElementById("card-"+p._id);
+  card.classList.add("selected");
+  const input=document.getElementById("qin-"+p._id);
+  input.value = p.unit==="kg" ? qty : String(qty);
+  refreshLine(p); refreshTotals();
+}
+
+function removeItem(p){
+  delete cart[p._id];
+  const card=document.getElementById("card-"+p._id);
+  card.classList.remove("selected");
+  document.getElementById("qin-"+p._id).value="";
+  refreshLine(p); refreshTotals();
+}
+
+function refreshLine(p){
+  const qty=cart[p._id];
+  const badge=document.getElementById("badge-"+p._id);
+  const lt=document.getElementById("lt-"+p._id);
+  if(qty===undefined){ badge.textContent=""; lt.textContent=""; return; }
+  const unit = p.unit==="kg" ? "kg" : (LANG==="es"?"pza":"pc");
+  badge.textContent = p.unit==="kg" ? qty : qty;
+  lt.textContent = `${qty} ${unit} × ${money(p.price)} = ${money(qty*p.price)}`;
+}
+
+function refreshTotals(){
+  let total=0, count=0;
+  for(const id in cart){
+    const p=PRODUCTS[id];
+    total += cart[id]*p.price;
+    count++;
+  }
+  document.getElementById("totalAmt").textContent = money(total);
+  const ic=document.getElementById("itemCount");
+  ic.textContent = T[LANG].items(count);
+  document.getElementById("sendBtn").disabled = count===0;
+}
+
+/* ---------- FORM / SUBMIT ---------- */
+function buildSummary(){
+  const box=document.getElementById("orderSummary");
+  box.innerHTML="";
+  let total=0;
+  for(const id in cart){
+    const p=PRODUCTS[id]; const qty=cart[id];
+    const sub=qty*p.price; total+=sub;
+    const unit = p.unit==="kg" ? "kg" : (LANG==="es"?"pza":"pc");
+    const row=document.createElement("div");
+    row.className="row";
+    row.innerHTML=`<span>${p.emoji} ${LANG==="es"?p.es:p.en} · ${qty} ${unit}</span><span>${money(sub)}</span>`;
+    box.appendChild(row);
+  }
+  const tot=document.createElement("div");
+  tot.className="row tot";
+  tot.innerHTML=`<span>Total</span><span>${money(total)}</span>`;
+  box.appendChild(tot);
+}
+
+function openForm(){
+  if(Object.keys(cart).length===0) return;
+  buildSummary();
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+function closeForm(){
+  document.getElementById("overlay").classList.remove("open");
+  document.body.style.overflow="";
+}
+
+function submitOrder(){
+  const name=document.getElementById("fName");
+  const phone=document.getElementById("fPhone");
+  let ok=true;
+  [name,phone].forEach(f=>{
+    if(!f.value.trim()){ f.classList.add("err"); ok=false; }
+    else f.classList.remove("err");
+  });
+  if(!ok){ alert(T[LANG].need); return; }
+
+  const addr=document.getElementById("fAddr").value.trim();
+  const notes=document.getElementById("fNotes").value.trim();
+  const pay=document.querySelector('input[name="pay"]:checked').value;
+
+  const L = {
+    es:{title:"*NUEVO PEDIDO — Frutería Alicia* 🍉",
+        order:"🛒 *Pedido:*", cust:"👤 *Cliente:*", name:"Nombre", phone:"Teléfono",
+        addr:"Dirección", notes:"Notas", pay:"Pago", total:"💰 *TOTAL:*"},
+    en:{title:"*NEW ORDER — Frutería Alicia* 🍉",
+        order:"🛒 *Order:*", cust:"👤 *Customer:*", name:"Name", phone:"Phone",
+        addr:"Address", notes:"Notes", pay:"Payment", total:"💰 *TOTAL:*"},
+  }[LANG];
+
+  let total=0;
+  let lines=[];
+  for(const id in cart){
+    const p=PRODUCTS[id]; const qty=cart[id]; const sub=qty*p.price; total+=sub;
+    const unit = p.unit==="kg" ? "kg" : (LANG==="es"?"pza":"pc");
+    lines.push(`• ${p.emoji} ${LANG==="es"?p.es:p.en} — ${qty} ${unit} × ${money(p.price)} = ${money(sub)}`);
+  }
+
+  let msg = L.title+"\n\n";
+  msg += L.order+"\n"+lines.join("\n")+"\n\n";
+  msg += L.total+" "+money(total)+"\n\n";
+  msg += L.cust+"\n";
+  msg += `${L.name}: ${name.value.trim()}\n`;
+  msg += `${L.phone}: ${phone.value.trim()}\n`;
+  if(addr) msg += `${L.addr}: ${addr}\n`;
+  if(notes) msg += `${L.notes}: ${notes}\n`;
+  msg += `${L.pay}: ${pay}\n`;
+
+  const url = `https://wa.me/${SHOP_PHONE}?text=${encodeURIComponent(msg)}`;
+  window.open(url,"_blank");
+}
+
+/* ---------- LANG ---------- */
+function toggleLang(){
+  LANG = LANG==="es" ? "en" : "es";
+  document.getElementById("langBtn").textContent = LANG==="es" ? "EN" : "ES";
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-es]").forEach(el=>{
+    el.textContent = LANG==="es" ? el.dataset.es : el.dataset.en;
+  });
+  // rebuild dynamic parts, preserving cart
+  const active = document.querySelector(".tab.active");
+  const activeIdx = active ? [...document.querySelectorAll(".tab")].indexOf(active) : 0;
+  buildTabs();
+  buildCatalog();
+  // re-apply cart selections
+  for(const id in cart){
+    const p=PRODUCTS[id];
+    const card=document.getElementById("card-"+id);
+    card.classList.add("selected");
+    document.getElementById("qin-"+id).value = p.unit==="kg"?cart[id]:String(cart[id]);
+    refreshLine(p);
+  }
+  const tabs=document.querySelectorAll(".tab");
+  tabs.forEach(t=>t.classList.remove("active"));
+  if(tabs[activeIdx]) tabs[activeIdx].classList.add("active");
+  refreshTotals();
+}
+
+/* ---------- SCROLL SPY ---------- */
+function initSpy(){
+  const opts={rootMargin:"-90px 0px -70% 0px", threshold:0};
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const id=e.target.id.replace("cat-","");
+        document.querySelectorAll(".tab").forEach(t=>{
+          t.classList.toggle("active", t.dataset.target==="cat-"+id);
+        });
+      }
+    });
+  },opts);
+  CATEGORIES.forEach(c=>{
+    const el=document.getElementById("cat-"+c.id);
+    if(el) io.observe(el);
+  });
+}
+
+/* ---------- INIT ---------- */
+buildTabs();
+buildCatalog();
+refreshTotals();
+initSpy();
+document.getElementById("overlay").addEventListener("click",(e)=>{
+  if(e.target.id==="overlay") closeForm();
+});
+</script>
+</body>
+</html>
