@@ -1,0 +1,456 @@
+{
+  "version": 1,
+  "updated": "2026-07-16",
+  "products": [
+    {
+      "cat": "frutas",
+      "es": "Aguacate",
+      "en": "Avocado",
+      "emoji": "🥑",
+      "unit": "kg",
+      "price": 65,
+      "active": true
+    },
+    {
+      "cat": "frutas",
+      "es": "Limón",
+      "en": "Lime",
+      "emoji": "🍋",
+      "unit": "kg",
+      "price": 35,
+      "active": true
+    },
+    {
+      "cat": "frutas",
+      "es": "Manzana Roja",
+      "en": "Red Apple",
+      "emoji": "🍎",
+      "unit": "kg",
+      "price": 45,
+      "active": true
+    },
+    {
+      "cat": "frutas",
+      "es": "Manzana Verde",
+      "en": "Green Apple",
+      "emoji": "🍏",
+      "unit": "kg",
+      "price": 42,
+      "active": true
+    },
+    {
+      "cat": "frutas",
+      "es": "Naranja",
+      "en": "Orange",
+      "emoji": "🍊",
+      "unit": "kg",
+      "price": 28,
+      "active": true
+    },
+    {
+      "cat": "frutas",
+      "es": "Plátano",
+      "en": "Banana",
+      "emoji": "🍌",
+      "unit": "kg",
+      "price": 22,
+      "active": true
+    },
+    {
+      "cat": "frutas",
+      "es": "Mango Ataulfo",
+      "en": "Ataulfo Mango",
+      "emoji": "🥭",
+      "unit": "kg",
+      "price": 55,
+      "active": true
+    },
+    {
+      "cat": "frutas",
+      "es": "Papaya",
+      "en": "Papaya",
+      "emoji": "🫐",
+      "unit": "kg",
+      "price": 35,
+      "active": true
+    },
+    {
+      "cat": "frutas",
+      "es": "Piña",
+      "en": "Pineapple",
+      "emoji": "🍍",
+      "unit": "kg",
+      "price": 30,
+      "active": true
+    },
+    {
+      "cat": "frutas",
+      "es": "Fresa",
+      "en": "Strawberry",
+      "emoji": "🍓",
+      "unit": "kg",
+      "price": 80,
+      "active": true
+    },
+    {
+      "cat": "frutas",
+      "es": "Uva Verde",
+      "en": "Green Grape",
+      "emoji": "🍇",
+      "unit": "kg",
+      "price": 90,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Cebolla Blanca",
+      "en": "White Onion",
+      "emoji": "🧅",
+      "unit": "kg",
+      "price": 25,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Cilantro",
+      "en": "Cilantro",
+      "emoji": "🌿",
+      "unit": "pza",
+      "price": 10,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Jitomate",
+      "en": "Tomato",
+      "emoji": "🍅",
+      "unit": "kg",
+      "price": 38,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Lechuga",
+      "en": "Lettuce",
+      "emoji": "🥬",
+      "unit": "pza",
+      "price": 18,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Papa",
+      "en": "Potato",
+      "emoji": "🥔",
+      "unit": "kg",
+      "price": 30,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Zanahoria",
+      "en": "Carrot",
+      "emoji": "🥕",
+      "unit": "kg",
+      "price": 28,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Chile Serrano",
+      "en": "Serrano Pepper",
+      "emoji": "🌶️",
+      "unit": "kg",
+      "price": 45,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Chile Jalapeño",
+      "en": "Jalapeño",
+      "emoji": "🌶️",
+      "unit": "kg",
+      "price": 40,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Cebolla Morada",
+      "en": "Red Onion",
+      "emoji": "🧅",
+      "unit": "kg",
+      "price": 30,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Nopal",
+      "en": "Cactus Paddle",
+      "emoji": "🌵",
+      "unit": "kg",
+      "price": 20,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Elote",
+      "en": "Corn Cob",
+      "emoji": "🌽",
+      "unit": "pza",
+      "price": 12,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Tomate Verde",
+      "en": "Tomatillo",
+      "emoji": "🟢",
+      "unit": "kg",
+      "price": 35,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Calabacita",
+      "en": "Zucchini",
+      "emoji": "🥒",
+      "unit": "kg",
+      "price": 28,
+      "active": true
+    },
+    {
+      "cat": "verduras",
+      "es": "Pepino",
+      "en": "Cucumber",
+      "emoji": "🥒",
+      "unit": "kg",
+      "price": 25,
+      "active": true
+    },
+    {
+      "cat": "lacteos",
+      "es": "Huevo San Juan",
+      "en": "Eggs (San Juan)",
+      "emoji": "🥚",
+      "unit": "pza",
+      "price": 62,
+      "active": true
+    },
+    {
+      "cat": "lacteos",
+      "es": "Leche Lala 1L",
+      "en": "Milk Lala 1L",
+      "emoji": "🥛",
+      "unit": "pza",
+      "price": 28,
+      "active": true
+    },
+    {
+      "cat": "lacteos",
+      "es": "Queso Fresco",
+      "en": "Fresh Cheese",
+      "emoji": "🧀",
+      "unit": "kg",
+      "price": 120,
+      "active": true
+    },
+    {
+      "cat": "lacteos",
+      "es": "Yogurt Natural",
+      "en": "Plain Yogurt",
+      "emoji": "🥣",
+      "unit": "pza",
+      "price": 25,
+      "active": true
+    },
+    {
+      "cat": "lacteos",
+      "es": "Crema",
+      "en": "Cream",
+      "emoji": "🍶",
+      "unit": "kg",
+      "price": 90,
+      "active": true
+    },
+    {
+      "cat": "lacteos",
+      "es": "Mantequilla",
+      "en": "Butter",
+      "emoji": "🧈",
+      "unit": "pza",
+      "price": 35,
+      "active": true
+    },
+    {
+      "cat": "abarrotes",
+      "es": "Aceite",
+      "en": "Cooking Oil",
+      "emoji": "🛢️",
+      "unit": "pza",
+      "price": 42,
+      "active": true
+    },
+    {
+      "cat": "abarrotes",
+      "es": "Arroz",
+      "en": "Rice",
+      "emoji": "🍚",
+      "unit": "kg",
+      "price": 24,
+      "active": true
+    },
+    {
+      "cat": "abarrotes",
+      "es": "Azúcar",
+      "en": "Sugar",
+      "emoji": "🍬",
+      "unit": "kg",
+      "price": 28,
+      "active": true
+    },
+    {
+      "cat": "abarrotes",
+      "es": "Frijol",
+      "en": "Beans",
+      "emoji": "🫘",
+      "unit": "kg",
+      "price": 35,
+      "active": true
+    },
+    {
+      "cat": "abarrotes",
+      "es": "Pan Bimbo",
+      "en": "Bread (Bimbo)",
+      "emoji": "🍞",
+      "unit": "pza",
+      "price": 35,
+      "active": true
+    },
+    {
+      "cat": "abarrotes",
+      "es": "Tortillas de Harina",
+      "en": "Flour Tortillas",
+      "emoji": "🫓",
+      "unit": "pza",
+      "price": 22,
+      "active": true
+    },
+    {
+      "cat": "abarrotes",
+      "es": "Salsa Valentina",
+      "en": "Valentina Sauce",
+      "emoji": "🌶️",
+      "unit": "pza",
+      "price": 18,
+      "active": true
+    },
+    {
+      "cat": "abarrotes",
+      "es": "Atún",
+      "en": "Canned Tuna",
+      "emoji": "🐟",
+      "unit": "pza",
+      "price": 25,
+      "active": true
+    },
+    {
+      "cat": "abarrotes",
+      "es": "Mayonesa",
+      "en": "Mayonnaise",
+      "emoji": "🥫",
+      "unit": "pza",
+      "price": 32,
+      "active": true
+    },
+    {
+      "cat": "bebidas",
+      "es": "Agua Bonafont 1L",
+      "en": "Bonafont Water 1L",
+      "emoji": "💧",
+      "unit": "pza",
+      "price": 15,
+      "active": true
+    },
+    {
+      "cat": "bebidas",
+      "es": "Cerveza Modelo",
+      "en": "Modelo Beer",
+      "emoji": "🍺",
+      "unit": "pza",
+      "price": 18,
+      "active": true
+    },
+    {
+      "cat": "bebidas",
+      "es": "Coca Cola 2L",
+      "en": "Coca Cola 2L",
+      "emoji": "🥤",
+      "unit": "pza",
+      "price": 32,
+      "active": true
+    },
+    {
+      "cat": "bebidas",
+      "es": "Agua de Coco",
+      "en": "Coconut Water",
+      "emoji": "🥥",
+      "unit": "pza",
+      "price": 25,
+      "active": true
+    },
+    {
+      "cat": "bebidas",
+      "es": "Horchata 1L",
+      "en": "Horchata 1L",
+      "emoji": "🧉",
+      "unit": "pza",
+      "price": 22,
+      "active": true
+    },
+    {
+      "cat": "bebidas",
+      "es": "Jamaica 1L",
+      "en": "Hibiscus 1L",
+      "emoji": "🌺",
+      "unit": "pza",
+      "price": 22,
+      "active": true
+    },
+    {
+      "cat": "botanas",
+      "es": "Galletas Marías",
+      "en": "María Cookies",
+      "emoji": "🍪",
+      "unit": "pza",
+      "price": 18,
+      "active": true
+    },
+    {
+      "cat": "botanas",
+      "es": "Sabritas",
+      "en": "Potato Chips",
+      "emoji": "🥔",
+      "unit": "pza",
+      "price": 23,
+      "active": true
+    },
+    {
+      "cat": "botanas",
+      "es": "Chicharrón",
+      "en": "Pork Rinds",
+      "emoji": "🍥",
+      "unit": "pza",
+      "price": 15,
+      "active": true
+    },
+    {
+      "cat": "botanas",
+      "es": "Cacahuate",
+      "en": "Peanuts",
+      "emoji": "🥜",
+      "unit": "pza",
+      "price": 12,
+      "active": true
+    }
+  ]
+}
