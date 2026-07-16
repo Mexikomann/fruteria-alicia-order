@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Frutería Alicia · Mi Tienda</title>
+<style>
+  :root{
+    /* --- Shared with index.html (visual family) --- */
+    --green:#2e7d32;
+    --green-light:#66bb6a;
+    --yellow:#f9a825;
+    --orange:#f4511e;
+    --bg:#fffef7;
+    --card:#ffffff;
+    --ink:#33291f;
+    --muted:#7a6d5c;
+    --line:#eadfce;
+    --shadow:0 2px 10px rgba(120,90,30,.12);
+    --cat-frutas:#f4511e;
+    --cat-verduras:#2e7d32;
+    --cat-lacteos:#1e88e5;
+    --cat-abarrotes:#8d6e63;
+    --cat-bebidas:#00acc1;
+    --cat-botanas:#f9a825;
+    /* admin-only */
+    --off:#c9bfae;
+    --danger:#d32f2f;
+    --wa:#25D366;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.4;
+  }
+  button{font-family:inherit;}
+  .hidden{display:none!important;}
+
+  /* ============ HEADER ============ */
+  header{
+    background:linear-gradient(135deg,var(--green) 0%,var(--green-light) 60%,var(--yellow) 130%);
+    color:#fff;
+    padding:16px 14px 14px;
+    box-shadow:var(--shadow);
+    position:relative;
+  }
+  header .htop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+  header h1{margin:0;font-size:21px;letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
+  header .sub{margin:4px 0 0;font-size:13px;opacity:.92;}
+  .hbtns{display:flex;gap:8px;flex:0 0 auto;}
+  .icon-btn{
+    background:rgba(255,255,255,.22);
+    border:1px solid rgba(255,255,255,.55);
+    color:#fff;border-radius:20px;
+    min-width:44px;height:38px;padding:0 12px;
+    font-size:14px;font-weight:700;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .icon-btn:active{transform:scale(.95);}
+  .count-badge{
+    display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+    background:rgba(255,255,255,.9);color:var(--green);
+    border-radius:20px;padding:5px 12px;font-size:13px;font-weight:800;
+    box-shadow:var(--shadow);
+  }
+
+  /* ============ OVERFLOW MENU ============ */
+  #menu{
+    position:absolute;top:56px;right:14px;z-index:60;
+    background:#fff;border:2px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);overflow:hidden;min-width:230px;
+  }
+  #menu button{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    background:none;border:none;padding:16px 16px;font-size:15px;font-weight:700;
+    color:var(--ink);cursor:pointer;min-height:48px;
+  }
+  #menu button:active{background:#f6f0e2;}
+
+  /* ============ TOOLBAR (sticky) ============ */
+  #toolbar{
+    position:sticky;top:0;z-index:30;
+    background:var(--bg);
+    padding:10px 12px 8px;
+    box-shadow:0 3px 8px rgba(120,90,30,.08);
+  }
+  .search-wrap{position:relative;}
+  .search-wrap .mag{
+    position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    font-size:16px;opacity:.55;pointer-events:none;
+  }
+  #search{
+    width:100%;font-size:16px;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 40px 12px 38px;background:#fff;
+  }
+  #search:focus{outline:none;border-color:var(--green-light);}
+  #searchClear{
+    position:absolute;right:6px;top:50%;transform:translateY(-50%);
+    border:none;background:#f0e9db;color:var(--muted);
+    width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;
+    display:none;align-items:center;justify-content:center;
+  }
+  #chips{
+    display:flex;gap:8px;overflow-x:auto;margin-top:10px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;
+  }
+  #chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:0 0 auto;border:2px solid var(--line);border-radius:22px;
+    padding:8px 14px;font-size:14px;font-weight:700;color:var(--muted);
+    background:#fff;cursor:pointer;white-space:nowrap;min-height:40px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .chip .cdot{width:9px;height:9px;border-radius:50%;background:var(--muted);}
+  .chip.active{color:#fff;border-color:transparent;}
+  .chip:active{transform:scale(.96);}
+
+  /* ============ PRODUCT LIST ============ */
+  main{padding:8px 12px 0;}
+  .grp{
+    font-size:14px;font-weight:800;color:var(--muted);
+    display:flex;align-items:center;gap:8px;margin:14px 4px 8px;
+    text-transform:uppercase;letter-spacing:.5px;
+  }
+  .grp .dot{width:10px;height:10px;border-radius:50%;}
+  .prow{
+    display:flex;align-items:center;gap:12px;
+    background:var(--card);border:2px solid var(--line);border-radius:16px;
+    padding:10px 10px 10px 14px;margin-bottom:10px;min-height:64px;
+    cursor:pointer;transition:border-color .15s,opacity .15s;
+  }
+  .prow:active{border-color:var(--green-light);}
+  .prow.off{opacity:.5;}
+  .pemoji{font-size:30px;line-height:1;flex:0 0 auto;width:38px;text-align:center;}
+  .pinfo{flex:1;min-width:0;}
+  .pname{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pmeta{margin-top:3px;}
+  .chip-unit{
+    display:inline-block;font-size:13px;font-weight:800;color:var(--orange);
+    background:#fdf1ea;border-radius:8px;padding:2px 8px;
+  }
+  .prow.off .chip-unit{color:var(--muted);background:#f2ece0;}
+  /* BIG availability toggle (≥56px touch target) */
+  .toggle{
+    position:relative;flex:0 0 auto;width:64px;height:56px;
+    border:none;background:transparent;cursor:pointer;padding:0;
+  }
+  .toggle .track{
+    position:absolute;top:50%;left:2px;transform:translateY(-50%);
+    width:60px;height:34px;border-radius:17px;background:var(--off);
+    transition:background .2s;
+  }
+  .toggle[aria-checked="true"] .track{background:var(--green);}
+  .toggle .knob{
+    position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s;
+  }
+  .toggle[aria-checked="true"] .knob{left:31px;}
+  .toggle:active .knob{transform:scale(.92);}
+
+  .list-msg{text-align:center;color:var(--muted);font-size:15px;padding:48px 20px;line-height:1.6;}
+  .spinner{
+    width:34px;height:34px;border:4px solid var(--line);border-top-color:var(--green);
+    border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .btn-retry{
+    margin-top:6px;padding:12px 26px;font-size:15px;font-weight:800;border:none;border-radius:12px;
+    background:var(--green);color:#fff;cursor:pointer;min-height:48px;
+  }
+  .btn-retry:active{transform:scale(.97);}
+
+  /* ============ FAB ============ */
+  #fab{
+    position:fixed;right:18px;bottom:24px;z-index:35;
+    width:60px;height:60px;border-radius:50%;border:none;
+    background:var(--green);color:#fff;font-size:34px;font-weight:400;line-height:1;
+    box-shadow:0 4px 14px rgba(46,125,50,.45);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:bottom .25s;
+  }
+  #fab:active{transform:scale(.94);}
+
+  /* ============ PUBLISH BAR ============ */
+  #pubbar{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:#fff;border-top:2px solid var(--line);
+    box-shadow:0 -4px 14px rgba(120,90,30,.16);
+    padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+    transform:translateY(120%);transition:transform .25s ease;
+    display:flex;align-items:center;gap:12px;min-height:66px;
+  }
+  #pubbar.show{transform:translateY(0);}
+  #pubbar.state-success{background:#f1f8e9;border-top-color:var(--green-light);}
+  #pubbar.state-fail{background:#fdecea;border-top-color:#f2b8b1;}
+  .pb-text{flex:1;min-width:0;}
+  .pb-text .t1{font-size:15px;font-weight:800;}
+  .pb-text .t2{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  #pubbar.state-fail .t1{color:var(--danger);}
+  #pubbar.state-success .t1{color:var(--green);}
+  .pb-btn{
+    flex:0 0 auto;background:var(--green);color:#fff;border:none;border-radius:14px;
+    padding:14px 18px;font-size:15px;font-weight:800;cursor:pointer;min-height:50px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .pb-btn:active{transform:scale(.97);}
+  .pb-btn.fail{background:var(--orange);}
+  .pb-btn:disabled{opacity:.7;cursor:default;transform:none;}
+  .pb-spin{width:18px;height:18px;border:3px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;}
+
+  /* ============ BOTTOM SHEET (add/edit) ============ */
+  #overlay{
+    position:fixed;inset:0;z-index:70;background:rgba(40,30,15,.5);
+    display:none;align-items:flex-end;justify-content:center;
+  }
+  #overlay.open{display:flex;}
+  #sheet{
+    background:#fff;width:100%;max-width:520px;border-radius:20px 20px 0 0;
+    padding:16px 18px calc(18px + env(safe-area-inset-bottom));
+    max-height:94vh;overflow-y:auto;animation:slideUp .25s ease;
+  }
+  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .sheet-head h2{margin:0;font-size:20px;}
+  .sheet-close{border:none;background:#f0e9db;color:var(--ink);width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:14px;font-weight:700;margin-bottom:6px;}
+  .field label .req{color:var(--orange);}
+  .field input{
+    width:100%;font-size:16px;border:2px solid var(--line);border-radius:12px;
+    padding:12px;background:#fff;
+  }
+  .field input:focus{outline:none;border-color:var(--green-light);}
+  .field input.err{border-color:var(--danger);}
+  .field-err{color:var(--danger);font-size:13px;font-weight:600;margin-top:5px;display:none;}
+  .field-err.show{display:block;}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:5px;}
+  .emoji-suggest{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .emoji-suggest button{
+    width:44px;height:44px;border:2px solid var(--line);border-radius:12px;
+    background:#fff;font-size:24px;cursor:pointer;line-height:1;
+  }
+  .emoji-suggest button:active{transform:scale(.92);border-color:var(--green-light);}
+  #emojiField{text-align:center;font-size:26px;padding:8px;letter-spacing:2px;}
+  .cat-chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .cat-chips button{
+    border:2px solid var(--line);border-radius:22px;padding:9px 14px;
+    font-size:14px;font-weight:700;color:var(--muted);background:#fff;cursor:pointer;
+    min-height:44px;display:flex;align-items:center;gap:6px;
+  }
+  .cat-chips button .cdot{width:9px;height:9px;border-radius:50%;}
+  .cat-chips button.sel{color:#fff;border-color:transparent;}
+  .segmented{display:flex;gap:8px;}
+  .segmented button{
+    flex:1;border:2px solid var(--line);border-radius:12px;padding:12px 4px;
+    font-size:14px;font-weight:700;color:var(--muted);background:#fff;cursor:pointer;
+    min-height:52px;line-height:1.2;
+  }
+  .segmented button.sel{border-color:var(--green);background:#f1f8e9;color:var(--green);}
+  .segmented button:active{transform:scale(.97);}
+  .price-wrap{position:relative;}
+  .price-wrap .cur{
+    position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    font-size:18px;font-weight:800;color:var(--muted);pointer-events:none;
+  }
+  #priceField{padding-left:32px;font-size:18px;font-weight:700;}
+  .sheet-actions{margin-top:18px;}
+  .btn-save{
+    width:100%;background:var(--green);color:#fff;border:none;border-radius:14px;
+    padding:16px;font-size:17px;font-weight:800;cursor:pointer;min-height:56px;
+  }
+  .btn-save:active{transform:scale(.98);}
+  .btn-delete{
+    display:block;width:100%;text-align:center;margin-top:14px;
+    background:none;border:none;color:var(--danger);font-size:15px;font-weight:700;
+    cursor:pointer;padding:12px;min-height:48px;
+  }
+
+  /* ============ DIALOG ============ */
+  #dialogOverlay{
+    position:fixed;inset:0;z-index:80;background:rgba(40,30,15,.55);
+    display:none;align-items:center;justify-content:center;padding:24px;
+  }
+  #dialogOverlay.open{display:flex;}
+  #dialog{
+    background:#fff;width:100%;max-width:360px;border-radius:18px;padding:22px 20px 18px;
+    box-shadow:var(--shadow);animation:pop .18s ease;
+  }
+  @keyframes pop{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}
+  #dialog h3{margin:0 0 8px;font-size:18px;}
+  #dialog p{margin:0 0 18px;font-size:14.5px;color:var(--muted);line-height:1.5;}
+  .dlg-actions{display:flex;gap:10px;}
+  .dlg-actions button{
+    flex:1;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:800;
+    cursor:pointer;min-height:50px;
+  }
+  #dlgCancel{background:#f0e9db;color:var(--ink);}
+  #dlgConfirm{background:var(--green);color:#fff;}
+  #dlgConfirm.danger{background:var(--danger);}
+  .dlg-actions button:active{transform:scale(.97);}
+
+  /* ============ TOAST ============ */
+  #toast{
+    position:fixed;left:50%;bottom:100px;transform:translate(-50%,20px);
+    z-index:90;background:var(--ink);color:#fff;border-radius:14px;
+    padding:14px 18px;font-size:14.5px;font-weight:700;box-shadow:var(--shadow);
+    max-width:88%;text-align:center;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+  #toast.err{background:var(--danger);}
+  #toast.ok{background:var(--green);}
+
+  /* ============ UNLOCK ============ */
+  #unlock{
+    position:fixed;inset:0;z-index:100;
+    background:linear-gradient(160deg,var(--green) 0%,var(--green-light) 55%,var(--yellow) 130%);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+  }
+  #unlock .card{
+    background:#fff;border-radius:22px;padding:30px 24px;width:100%;max-width:360px;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);text-align:center;
+  }
+  #unlock .logo{font-size:52px;line-height:1;}
+  #unlock h1{margin:10px 0 2px;font-size:22px;color:var(--ink);}
+  #unlock .u-sub{margin:0 0 22px;font-size:14px;color:var(--muted);}
+  #pin{
+    width:100%;text-align:center;font-size:28px;font-weight:800;letter-spacing:10px;
+    border:2px solid var(--line);border-radius:14px;padding:14px;background:var(--bg);
+  }
+  #pin:focus{outline:none;border-color:var(--green-light);}
+  #pin.err{border-color:var(--danger);}
+  #pinErr{color:var(--danger);font-size:14px;font-weight:700;margin:10px 0 0;min-height:20px;}
+  #unlockBtn{
+    width:100%;margin-top:16px;background:var(--green);color:#fff;border:none;border-radius:14px;
+    padding:16px;font-size:17px;font-weight:800;cursor:pointer;min-height:56px;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  #unlockBtn:active{transform:scale(.98);}
+  #unlockBtn:disabled{opacity:.7;}
+  #uLang{
+    position:absolute;top:18px;right:18px;background:rgba(255,255,255,.22);
+    border:1px solid rgba(255,255,255,.55);color:#fff;border-radius:20px;
+    padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ UNLOCK SCREEN ============ -->
+<div id="unlock">
+  <button id="uLang" type="button">EN</button>
+  <div class="card">
+    <div class="logo" id="uLogo">🍉</div>
+    <h1 id="uStore">Frutería Alicia</h1>
+    <p class="u-sub" data-es="Ingresa tu PIN para administrar tu tienda" data-en="Enter your PIN to manage your store">Ingresa tu PIN para administrar tu tienda</p>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="••••">
+    <p id="pinErr" aria-live="polite"></p>
+    <button id="unlockBtn" type="button">
+      <span data-es="Entrar" data-en="Enter">Entrar</span>
+    </button>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" class="hidden">
+  <header>
+    <div class="htop">
+      <div>
+        <h1><span id="hLogo">🍉</span> <span id="hStore">Frutería Alicia</span></h1>
+        <p class="sub" data-es="Panel de productos" data-en="Products panel">Panel de productos</p>
+      </div>
+      <div class="hbtns">
+        <button class="icon-btn" id="langBtn" type="button">EN</button>
+        <button class="icon-btn" id="menuBtn" type="button" aria-label="Menú">⋮</button>
+      </div>
+    </div>
+    <span class="count-badge" id="countBadge">—</span>
+
+    <div id="menu" class="hidden" role="menu">
+      <button id="restoreBtn" type="button" role="menuitem">
+        <span>↩️</span>
+        <span data-es="Restaurar versión anterior" data-en="Restore previous version">Restaurar versión anterior</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="toolbar">
+    <div class="search-wrap">
+      <span class="mag">🔍</span>
+      <input id="search" type="text" autocomplete="off"
+             data-es-ph="Buscar producto…" data-en-ph="Search product…" placeholder="Buscar producto…">
+      <button id="searchClear" type="button" aria-label="Borrar">✕</button>
+    </div>
+    <div id="chips"></div>
+  </div>
+
+  <main id="list"><!-- product rows injected here --></main>
+</div>
+
+<!-- ============ FAB ============ -->
+<button id="fab" class="hidden" type="button" aria-label="Agregar producto">+</button>
+
+<!-- ============ PUBLISH BAR ============ -->
+<div id="pubbar"><!-- injected --></div>
+
+<!-- ============ ADD / EDIT SHEET ============ -->
+<div id="overlay">
+  <div id="sheet" role="dialog" aria-modal="true">
+    <div class="sheet-head">
+      <h2 id="sheetTitle">—</h2>
+      <button class="sheet-close" id="sheetClose" type="button" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="field">
+      <label data-es="Emoji" data-en="Emoji">Emoji</label>
+      <input id="emojiField" type="text" autocomplete="off" placeholder="🛒">
+      <div class="hint" data-es="Usa el teclado de emojis de tu teléfono, o elige uno:" data-en="Use your phone's emoji keyboard, or pick one:">Usa el teclado de emojis de tu teléfono, o elige uno:</div>
+      <div class="emoji-suggest" id="emojiSuggest"></div>
+    </div>
+
+    <div class="field">
+      <label><span data-es="Nombre (ES)" data-en="Name (ES)">Nombre (ES)</span> <span class="req">*</span></label>
+      <input id="nameEsField" type="text" autocomplete="off">
+      <div class="field-err" id="nameEsErr"></div>
+    </div>
+
+    <div class="field">
+      <label data-es="Nombre (EN)" data-en="Name (EN)">Nombre (EN)</label>
+      <input id="nameEnField" type="text" autocomplete="off">
+      <div class="hint" data-es="Si lo dejas vacío, se usa el nombre en español." data-en="If left empty, the Spanish name is used.">Si lo dejas vacío, se usa el nombre en español.</div>
+    </div>
+
+    <div class="field">
+      <label data-es="Categoría" data-en="Category">Categoría</label>
+      <div class="cat-chips" id="catChips"></div>
+    </div>
+
+    <div class="field">
+      <label data-es="Unidad" data-en="Unit">Unidad</label>
+      <div class="segmented" id="unitSeg">
+        <button type="button" data-unit="kg"   data-es="Por kilo"    data-en="By kilo">Por kilo</button>
+        <button type="button" data-unit="pza"  data-es="Por pieza"   data-en="By piece">Por pieza</button>
+        <button type="button" data-unit="fijo" data-es="Precio fijo" data-en="Fixed price">Precio fijo</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label data-es="Precio" data-en="Price">Precio</label>
+      <div class="price-wrap">
+        <span class="cur" id="curPrefix">$</span>
+        <input id="priceField" type="text" inputmode="decimal" autocomplete="off">
+      </div>
+      <div class="field-err" id="priceErr"></div>
+    </div>
+
+    <div class="sheet-actions">
+      <button class="btn-save" id="saveBtn" type="button" data-es="Guardar" data-en="Save">Guardar</button>
+      <button class="btn-delete hidden" id="deleteBtn" type="button" data-es="Eliminar producto" data-en="Delete product">Eliminar producto</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONFIRM DIALOG ============ -->
+<div id="dialogOverlay">
+  <div id="dialog" role="alertdialog" aria-modal="true">
+    <h3 id="dlgTitle">—</h3>
+    <p id="dlgMsg">—</p>
+    <div class="dlg-actions">
+      <button id="dlgCancel" type="button">Cancelar</button>
+      <button id="dlgConfirm" type="button">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div id="toast" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* ==================================================================
+   STORE CONFIG
+   Per-deployment values. Hermes swaps these for Marli's Salsa, or
+   loads them from a data/config file. Never hardcoded into markup.
+   ================================================================== */
+const CONFIG = {
+  storeName: "Frutería Alicia",
+  logo: "🍉",
+  currency: "$",     // MXN "$" for Alicia, USD "$" for Marli's
+  defaultLang: "es", // "es" for Alicia, "en" for Marli's
+};
+
+/* Category definitions — labels + colors (visual family with index.html).
+   Filter chips are still DERIVED FROM THE DATA (see buildChips): any category
+   present in the catalog but missing here falls back to a generated label. */
+const CATEGORIES = [
+  {id:"frutas",    es:"Frutas",    en:"Fruits",     color:"var(--cat-frutas)"},
+  {id:"verduras",  es:"Verduras",  en:"Vegetables", color:"var(--cat-verduras)"},
+  {id:"lacteos",   es:"Lácteos",   en:"Dairy",      color:"var(--cat-lacteos)"},
+  {id:"abarrotes", es:"Abarrotes", en:"Groceries",  color:"var(--cat-abarrotes)"},
+  {id:"bebidas",   es:"Bebidas",   en:"Drinks",     color:"var(--cat-bebidas)"},
+  {id:"botanas",   es:"Botanas",   en:"Snacks",     color:"var(--cat-botanas)"},
+];
+
+/* ==================================================================
+   ██  BACKEND STUBS — THE ONLY PLACE HERMES NEEDS TO TOUCH  ██
+   ------------------------------------------------------------------
+   Each returns a Promise. The MOCK block makes every UI state
+   demonstrable in a plain browser today (file:// or localhost).
+   To wire the real backend: set MOCK.enabled = false and fill in
+   the real implementation where marked. The UI code below never
+   changes — it only awaits these four functions.
+   ------------------------------------------------------------------
+   Demo the alternate states by adding a URL query flag, e.g.
+     admin.html?mock=fail-publish   → publish always fails (retry UI)
+     admin.html?mock=fail-load      → catalog load fails (retry UI)
+     admin.html?mock=empty          → empty catalog state
+     admin.html?mock=fail-restore   → restore fails
+   ================================================================== */
+const MOCK = {
+  enabled: true,               // ← Hermes: set to false once the backend is wired
+  pin: "1234",                 // demo PIN
+  latency: 1100,               // simulated network delay (ms)
+  q: (location.search || ""),
+};
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* (1) Load the current published catalog.
+   Hermes: fetch products.json from GitHub (also capture its `sha`
+   for the publish commit). MUST resolve to { products: [ ...schema ] }. */
+async function loadCatalog() {
+  if (MOCK.enabled) {
+    await wait(MOCK.latency);
+    if (/fail-load/.test(MOCK.q)) throw new Error("mock: load failed");
+    return { products: /empty/.test(MOCK.q) ? [] : deepCopy(MOCK_PRODUCTS) };
+  }
+  // --- real (non-mock) fallback: same fetch the customer form uses ---
+  const res = await fetch("products.json?v=" + Date.now(), { cache: "no-store" });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return res.json();
+}
+
+/* (2) Publish pending changes.
+   `payload` = { products: [ ...full new catalog... ] } ready to write.
+   Hermes: commit products.json back to the repo (use stored sha, re-check
+   for conflicts). Resolve on success; THROW on failure — the UI keeps the
+   owner's changes safe and shows a retry button. */
+async function publishChanges(payload) {
+  if (MOCK.enabled) {
+    await wait(MOCK.latency);
+    if (/fail-publish/.test(MOCK.q)) throw new Error("mock: publish failed");
+    return true;
+  }
+  throw new Error("publishChanges() not wired yet");
+}
+
+/* (3) Restore the previously published catalog.
+   Hermes: recover the prior products.json from git history.
+   MUST resolve to { products: [ ...schema ] }. THROW on failure. */
+async function restorePrevious() {
+  if (MOCK.enabled) {
+    await wait(MOCK.latency);
+    if (/fail-restore/.test(MOCK.q)) throw new Error("mock: restore failed");
+    // Demo: pretend the previous published version is the original seed.
+    return { products: deepCopy(MOCK_PRODUCTS) };
+  }
+  throw new Error("restorePrevious() not wired yet");
+}
+
+/* (4) Verify the unlock PIN.
+   Hermes: replace with real PIN check / token issuance. Resolve boolean. */
+async function verifyPin(pin) {
+  if (MOCK.enabled) {
+    await wait(300);
+    return pin === MOCK.pin;
+  }
+  return false;
+}
+/* ================= END BACKEND STUBS ================= */
+
+
+/* ==================================================================
+   MOCK CATALOG (demo data only — the real data comes from loadCatalog).
+   Mirrors products.json and adds: one INACTIVE item (dimmed-row demo)
+   and two "fijo" fixed-price items (third unit type demo).
+   ================================================================== */
+const MOCK_PRODUCTS = [
+  {cat:"frutas", es:"Aguacate", en:"Avocado", emoji:"🥑", unit:"kg", price:65, active:true},
+  {cat:"frutas", es:"Limón", en:"Lime", emoji:"🍋", unit:"kg", price:35, active:true},
+  {cat:"frutas", es:"Manzana Roja", en:"Red Apple", emoji:"🍎", unit:"kg", price:45, active:true},
+  {cat:"frutas", es:"Manzana Verde", en:"Green Apple", emoji:"🍏", unit:"kg", price:42, active:true},
+  {cat:"frutas", es:"Naranja", en:"Orange", emoji:"🍊", unit:"kg", price:28, active:true},
+  {cat:"frutas", es:"Plátano", en:"Banana", emoji:"🍌", unit:"kg", price:22, active:true},
+  {cat:"frutas", es:"Mango Ataulfo", en:"Ataulfo Mango", emoji:"🥭", unit:"kg", price:55, active:true},
+  {cat:"frutas", es:"Papaya", en:"Papaya", emoji:"🫐", unit:"kg", price:35, active:true},
+  {cat:"frutas", es:"Piña", en:"Pineapple", emoji:"🍍", unit:"kg", price:30, active:true},
+  {cat:"frutas", es:"Fresa", en:"Strawberry", emoji:"🍓", unit:"kg", price:80, active:true},
+  {cat:"frutas", es:"Uva Verde", en:"Green Grape", emoji:"🍇", unit:"kg", price:90, active:false},
+  {cat:"verduras", es:"Cebolla Blanca", en:"White Onion", emoji:"🧅", unit:"kg", price:25, active:true},
+  {cat:"verduras", es:"Cilantro", en:"Cilantro", emoji:"🌿", unit:"pza", price:10, active:true},
+  {cat:"verduras", es:"Jitomate", en:"Tomato", emoji:"🍅", unit:"kg", price:38, active:true},
+  {cat:"verduras", es:"Lechuga", en:"Lettuce", emoji:"🥬", unit:"pza", price:18, active:true},
+  {cat:"verduras", es:"Papa", en:"Potato", emoji:"🥔", unit:"kg", price:30, active:true},
+  {cat:"verduras", es:"Zanahoria", en:"Carrot", emoji:"🥕", unit:"kg", price:28, active:true},
+  {cat:"verduras", es:"Chile Serrano", en:"Serrano Pepper", emoji:"🌶️", unit:"kg", price:45, active:true},
+  {cat:"verduras", es:"Chile Jalapeño", en:"Jalapeño", emoji:"🌶️", unit:"kg", price:40, active:true},
+  {cat:"verduras", es:"Cebolla Morada", en:"Red Onion", emoji:"🧅", unit:"kg", price:30, active:true},
+  {cat:"verduras", es:"Nopal", en:"Cactus Paddle", emoji:"🌵", unit:"kg", price:20, active:true},
+  {cat:"verduras", es:"Elote", en:"Corn Cob", emoji:"🌽", unit:"pza", price:12, active:true},
+  {cat:"verduras", es:"Tomate Verde", en:"Tomatillo", emoji:"🟢", unit:"kg", price:35, active:true},
+  {cat:"verduras", es:"Calabacita", en:"Zucchini", emoji:"🥒", unit:"kg", price:28, active:true},
+  {cat:"verduras", es:"Pepino", en:"Cucumber", emoji:"🥒", unit:"kg", price:25, active:true},
+  {cat:"lacteos", es:"Huevo San Juan", en:"Eggs (San Juan)", emoji:"🥚", unit:"pza", price:62, active:true},
+  {cat:"lacteos", es:"Leche Lala 1L", en:"Milk Lala 1L", emoji:"🥛", unit:"pza", price:28, active:true},
+  {cat:"lacteos", es:"Queso Fresco", en:"Fresh Cheese", emoji:"🧀", unit:"kg", price:120, active:true},
+  {cat:"lacteos", es:"Yogurt Natural", en:"Plain Yogurt", emoji:"🥣", unit:"pza", price:25, active:true},
+  {cat:"lacteos", es:"Crema", en:"Cream", emoji:"🍶", unit:"kg", price:90, active:true},
+  {cat:"lacteos", es:"Mantequilla", en:"Butter", emoji:"🧈", unit:"pza", price:35, active:true},
+  {cat:"abarrotes", es:"Aceite", en:"Cooking Oil", emoji:"🛢️", unit:"pza", price:42, active:true},
+  {cat:"abarrotes", es:"Arroz", en:"Rice", emoji:"🍚", unit:"kg", price:24, active:true},
+  {cat:"abarrotes", es:"Azúcar", en:"Sugar", emoji:"🍬", unit:"kg", price:28, active:true},
+  {cat:"abarrotes", es:"Frijol", en:"Beans", emoji:"🫘", unit:"kg", price:35, active:true},
+  {cat:"abarrotes", es:"Pan Bimbo", en:"Bread (Bimbo)", emoji:"🍞", unit:"pza", price:35, active:true},
+  {cat:"abarrotes", es:"Tortillas de Harina", en:"Flour Tortillas", emoji:"🫓", unit:"pza", price:22, active:true},
+  {cat:"abarrotes", es:"Salsa Valentina", en:"Valentina Sauce", emoji:"🌶️", unit:"fijo", price:18, active:true},
+  {cat:"abarrotes", es:"Cátsup", en:"Ketchup", emoji:"🍅", unit:"fijo", price:32, active:true},
+  {cat:"abarrotes", es:"Atún", en:"Canned Tuna", emoji:"🐟", unit:"pza", price:25, active:true},
+  {cat:"abarrotes", es:"Mayonesa", en:"Mayonnaise", emoji:"🥫", unit:"pza", price:32, active:true},
+  {cat:"bebidas", es:"Agua Bonafont 1L", en:"Bonafont Water 1L", emoji:"💧", unit:"pza", price:15, active:true},
+  {cat:"bebidas", es:"Cerveza Modelo", en:"Modelo Beer", emoji:"🍺", unit:"pza", price:18, active:true},
+  {cat:"bebidas", es:"Coca Cola 2L", en:"Coca Cola 2L", emoji:"🥤", unit:"pza", price:32, active:true},
+  {cat:"bebidas", es:"Agua de Coco", en:"Coconut Water", emoji:"🥥", unit:"pza", price:25, active:true},
+  {cat:"bebidas", es:"Horchata 1L", en:"Horchata 1L", emoji:"🧉", unit:"pza", price:22, active:true},
+  {cat:"bebidas", es:"Jamaica 1L", en:"Hibiscus 1L", emoji:"🌺", unit:"pza", price:22, active:true},
+  {cat:"botanas", es:"Galletas Marías", en:"María Cookies", emoji:"🍪", unit:"pza", price:18, active:true},
+  {cat:"botanas", es:"Sabritas", en:"Potato Chips", emoji:"🥔", unit:"pza", price:23, active:true},
+  {cat:"botanas", es:"Chicharrón", en:"Pork Rinds", emoji:"🍥", unit:"pza", price:15, active:true},
+  {cat:"botanas", es:"Cacahuate", en:"Peanuts", emoji:"🥜", unit:"pza", price:12, active:true},
+];
+
+/* Common emoji suggestions for the picker (12). */
+const EMOJI_SUGGEST = ["🍎","🍌","🥑","🍅","🥕","🥬","🥛","🧀","🥚","🌶️","🍞","🥤"];
+
+/* ==================================================================
+   BILINGUAL STRING DICTIONARY
+   ================================================================== */
+const T = {
+  es: {
+    dir: "EN",                    // label on the toggle button (offers the OTHER language)
+    enter: "Entrar", entering: "Entrando…",
+    pinErr: "PIN incorrecto. Intenta de nuevo.", pinEmpty: "Escribe tu PIN.",
+    count: (a, t) => `${a} ${a === 1 ? "activo" : "activos"} / ${t}`,
+    all: "Todas",
+    unitKg: "/kg", unitPza: "/pza", unitFijo: "fijo",
+    loading: "Cargando productos…",
+    loadFail: "No se pudo cargar el catálogo.", retry: "Reintentar",
+    emptyCat: "No hay productos todavía.",
+    noResults: (q) => `Sin resultados para “${q}”.`,
+    addTitle: "Nuevo producto", editTitle: "Editar producto",
+    save: "Guardar", del: "Eliminar producto",
+    errName: "El nombre en español es obligatorio.",
+    errPrice: "El precio debe ser mayor que 0.",
+    delTitle: (n) => `¿Eliminar ${n}?`,
+    delMsg: "Esta acción no se puede deshacer.",
+    delOk: "Eliminar", cancel: "Cancelar",
+    pbPending: (n) => `${n} ${n === 1 ? "cambio" : "cambios"} sin publicar`,
+    pbPendingSub: "Toca publicar para que tus clientes lo vean.",
+    pbPublish: "Publicar ahora",
+    pbPublishing: "Publicando…", pbPublishingSub: "Un momento, por favor.",
+    pbSuccess: "✓ Publicado", pbSuccessSub: "Visible para clientes en ~1 minuto.",
+    pbFail: "No se pudo publicar", pbFailSub: "Tus cambios están guardados aquí.",
+    pbRetry: "Reintentar",
+    restoreTitle: "¿Restaurar versión anterior?",
+    restoreMsg: "Se descartarán los cambios actuales y volverás a la última versión publicada.",
+    restoreOk: "Restaurar",
+    restored: "Versión anterior restaurada.",
+    restoreFail: "No se pudo restaurar. Intenta de nuevo.",
+    saved: "Producto guardado.", deleted: "Producto eliminado.",
+  },
+  en: {
+    dir: "ES",
+    enter: "Enter", entering: "Entering…",
+    pinErr: "Incorrect PIN. Try again.", pinEmpty: "Type your PIN.",
+    count: (a, t) => `${a} active / ${t}`,
+    all: "All",
+    unitKg: "/kg", unitPza: "/ea", unitFijo: "fixed",
+    loading: "Loading products…",
+    loadFail: "Couldn't load the catalog.", retry: "Retry",
+    emptyCat: "No products yet.",
+    noResults: (q) => `No results for “${q}”.`,
+    addTitle: "New product", editTitle: "Edit product",
+    save: "Save", del: "Delete product",
+    errName: "The Spanish name is required.",
+    errPrice: "Price must be greater than 0.",
+    delTitle: (n) => `Delete ${n}?`,
+    delMsg: "This action can't be undone.",
+    delOk: "Delete", cancel: "Cancel",
+    pbPending: (n) => `${n} unpublished ${n === 1 ? "change" : "changes"}`,
+    pbPendingSub: "Tap publish so your customers can see it.",
+    pbPublish: "Publish now",
+    pbPublishing: "Publishing…", pbPublishingSub: "One moment, please.",
+    pbSuccess: "✓ Published", pbSuccessSub: "Live for customers in ~1 minute.",
+    pbFail: "Couldn't publish", pbFailSub: "Your changes are saved here.",
+    pbRetry: "Retry",
+    restoreTitle: "Restore previous version?",
+    restoreMsg: "Current changes will be discarded and you'll return to the last published version.",
+    restoreOk: "Restore",
+    restored: "Previous version restored.",
+    restoreFail: "Couldn't restore. Try again.",
+    saved: "Product saved.", deleted: "Product deleted.",
+  },
+};
+
+/* ==================================================================
+   APP STATE
+   ================================================================== */
+let LANG = CONFIG.defaultLang;
+let published = [];          // last known published catalog (deep copy)
+let working = [];            // owner's current working catalog (with edits)
+let activeCat = "__all__";   // current category filter
+let query = "";              // search query
+let idSeq = 0;               // generator for new product ids
+let sheetMode = "add";       // "add" | "edit"
+let editingId = null;
+let draftUnit = "kg";        // selected unit in the sheet
+let draftCat = CATEGORIES[0].id;
+let pubState = "idle";       // idle | publishing | success | fail
+let dialogAction = null;     // pending confirm callback
+const DRAFT_KEY = "aliciaAdminDraft_v1";
+
+/* ==================================================================
+   SMALL HELPERS
+   ================================================================== */
+const $ = (id) => document.getElementById(id);
+function deepCopy(x) { return JSON.parse(JSON.stringify(x)); }
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+/* Accent- and case-insensitive normalize for search ("platano" finds "Plátano"). */
+function norm(s) {
+  return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+function newId() { return "new_" + (++idSeq) + "_" + Date.now(); }
+function catLabel(id) {
+  const c = CATEGORIES.find((x) => x.id === id);
+  if (c) return LANG === "es" ? c.es : c.en;
+  return id.charAt(0).toUpperCase() + id.slice(1); // fallback for data-only categories
+}
+function catColor(id) {
+  const c = CATEGORIES.find((x) => x.id === id);
+  return c ? c.color : "var(--muted)";
+}
+function fmtPrice(n) {
+  return Number.isInteger(n) ? String(n) : Number(n).toFixed(2);
+}
+function priceLabel(p) {
+  const c = CONFIG.currency, v = fmtPrice(p.price), t = T[LANG];
+  if (p.unit === "kg") return `${c}${v}${t.unitKg}`;
+  if (p.unit === "pza") return `${c}${v}${t.unitPza}`;
+  return `${c}${v} ${t.unitFijo}`;
+}
+
+/* Ordered list of category ids: known categories first, then any extras
+   that appear in the data (so chips/groups come FROM THE DATA). */
+function orderedCats() {
+  const seen = [];
+  CATEGORIES.forEach((c) => { if (working.some((p) => p.cat === c.id)) seen.push(c.id); });
+  working.forEach((p) => { if (!seen.includes(p.cat)) seen.push(p.cat); });
+  return seen;
+}
+
+/* ==================================================================
+   DRAFT PERSISTENCE (client-only localStorage — safe, no server).
+   Guarantees the owner's unpublished changes survive a page close.
+   Hermes may swap for a more robust store; the interface is these 3 fns.
+   ================================================================== */
+function saveDraft() {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ products: working })); }
+  catch (e) { /* private mode / quota — non-fatal, changes still live in memory */ }
+}
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    return Array.isArray(d.products) ? d.products : null;
+  } catch (e) { return null; }
+}
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+}
+
+/* ==================================================================
+   CHANGE DIFF (drives the "N cambios sin publicar" counter)
+   ================================================================== */
+function sameProduct(a, b) {
+  return a.cat === b.cat && a.es === b.es && a.en === b.en &&
+    a.emoji === b.emoji && a.unit === b.unit && a.price === b.price &&
+    !!a.active === !!b.active;
+}
+function pendingCount() {
+  const pub = new Map(published.map((p) => [p.id, p]));
+  const wrk = new Map(working.map((p) => [p.id, p]));
+  let n = 0;
+  working.forEach((p) => {
+    if (!pub.has(p.id)) n++;                        // added
+    else if (!sameProduct(pub.get(p.id), p)) n++;   // modified
+  });
+  published.forEach((p) => { if (!wrk.has(p.id)) n++; }); // deleted
+  return n;
+}
+
+/* ==================================================================
+   STATIC-STRING LANGUAGE APPLICATION (data-es / data-en, like index.html)
+   ================================================================== */
+function applyStaticLang() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-es]").forEach((el) => {
+    el.textContent = LANG === "es" ? el.dataset.es : el.dataset.en;
+  });
+  document.querySelectorAll("[data-es-ph]").forEach((el) => {
+    el.placeholder = LANG === "es" ? el.dataset.esPh : el.dataset.enPh;
+  });
+  $("langBtn").textContent = T[LANG].dir;
+  $("uLang").textContent = T[LANG].dir;
+}
+
+/* ==================================================================
+   RENDER: COUNT BADGE
+   ================================================================== */
+function renderCount() {
+  const active = working.filter((p) => p.active).length;
+  $("countBadge").textContent = T[LANG].count(active, working.length);
+}
+
+/* ==================================================================
+   RENDER: CATEGORY FILTER CHIPS (derived from data)
+   ================================================================== */
+function renderChips() {
+  const wrap = $("chips");
+  const cats = orderedCats();
+  let html = `<button class="chip ${activeCat === "__all__" ? "active" : ""}" data-cat="__all__"
+                style="${activeCat === "__all__" ? "background:var(--green)" : ""}">
+                ${esc(T[LANG].all)}</button>`;
+  cats.forEach((id) => {
+    const on = activeCat === id;
+    html += `<button class="chip ${on ? "active" : ""}" data-cat="${esc(id)}"
+               style="${on ? `background:${catColor(id)}` : ""}">
+               ${on ? "" : `<span class="cdot" style="background:${catColor(id)}"></span>`}
+               ${esc(catLabel(id))}</button>`;
+  });
+  wrap.innerHTML = html;
+}
+
+/* ==================================================================
+   RENDER: PRODUCT LIST
+   ================================================================== */
+function renderList() {
+  const list = $("list");
+  const nq = norm(query);
+
+  // filter
+  let items = working.filter((p) => {
+    if (activeCat !== "__all__" && p.cat !== activeCat) return false;
+    if (nq && !(norm(p.es).includes(nq) || norm(p.en).includes(nq))) return false;
+    return true;
+  });
+
+  if (items.length === 0) {
+    list.innerHTML = `<div class="list-msg">${query ? esc(T[LANG].noResults(query)) : esc(T[LANG].emptyCat)}</div>`;
+    return;
+  }
+
+  // group by category in stable order
+  const order = orderedCats();
+  const buckets = {};
+  items.forEach((p) => { (buckets[p.cat] = buckets[p.cat] || []).push(p); });
+
+  let html = "";
+  order.forEach((cid) => {
+    const rows = buckets[cid];
+    if (!rows || !rows.length) return;
+    rows.sort((a, b) => a.es.localeCompare(b.es, "es"));
+    html += `<div class="grp"><span class="dot" style="background:${catColor(cid)}"></span>${esc(catLabel(cid))}</div>`;
+    rows.forEach((p) => {
+      const name = LANG === "es" ? p.es : (p.en || p.es);
+      html += `
+        <div class="prow ${p.active ? "" : "off"}" data-id="${esc(p.id)}">
+          <div class="pemoji">${esc(p.emoji || "🛒")}</div>
+          <div class="pinfo">
+            <div class="pname">${esc(name)}</div>
+            <div class="pmeta"><span class="chip-unit">${esc(priceLabel(p))}</span></div>
+          </div>
+          <button class="toggle" type="button" role="switch" aria-checked="${p.active}"
+                  data-toggle="${esc(p.id)}"
+                  aria-label="${esc(name)} — ${p.active ? "activo" : "inactivo"}">
+            <span class="track"><span class="knob"></span></span>
+          </button>
+        </div>`;
+    });
+  });
+  list.innerHTML = html;
+}
+
+/* ==================================================================
+   RENDER: PUBLISH BAR (all states)
+   ================================================================== */
+function renderPubbar() {
+  const bar = $("pubbar");
+  const t = T[LANG];
+  const n = pendingCount();
+  bar.className = ""; // reset
+
+  // Decide visibility & content by state.
+  if (pubState === "publishing") {
+    bar.innerHTML = `
+      <div class="pb-text"><div class="t1">${esc(t.pbPublishing)}</div><div class="t2">${esc(t.pbPublishingSub)}</div></div>
+      <button class="pb-btn" disabled><span class="pb-spin"></span></button>`;
+    bar.classList.add("show");
+  } else if (pubState === "success") {
+    bar.className = "state-success show";
+    bar.innerHTML = `<div class="pb-text"><div class="t1">${esc(t.pbSuccess)}</div><div class="t2">${esc(t.pbSuccessSub)}</div></div>`;
+  } else if (pubState === "fail") {
+    bar.className = "state-fail show";
+    bar.innerHTML = `
+      <div class="pb-text"><div class="t1">${esc(t.pbFail)}</div><div class="t2">${esc(t.pbFailSub)}</div></div>
+      <button class="pb-btn fail" id="pbBtn"><span>↻</span><span>${esc(t.pbRetry)}</span></button>`;
+    $("pbBtn").onclick = doPublish;
+  } else if (n > 0) { // idle with pending changes
+    bar.innerHTML = `
+      <div class="pb-text"><div class="t1">${esc(t.pbPending(n))}</div><div class="t2">${esc(t.pbPendingSub)}</div></div>
+      <button class="pb-btn" id="pbBtn"><span>📤</span><span>${esc(t.pbPublish)}</span></button>`;
+    bar.classList.add("show");
+    $("pbBtn").onclick = doPublish;
+  } else {
+    bar.classList.remove("show"); // nothing pending → hidden
+  }
+
+  // Keep the FAB clear of the bar.
+  $("fab").style.bottom = bar.classList.contains("show") ? "96px" : "24px";
+}
+
+/* Full re-render of the dynamic app surface. */
+function renderAll() {
+  renderCount();
+  renderChips();
+  renderList();
+  renderPubbar();
+}
+
+/* Called after any catalog mutation. */
+function onChange() {
+  saveDraft();
+  renderCount();
+  renderPubbar();
+}
+
+/* ==================================================================
+   TOAST
+   ================================================================== */
+let toastTimer = null;
+function toast(msg, kind) {
+  const el = $("toast");
+  el.textContent = msg;
+  el.className = "show" + (kind ? " " + kind : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ""; }, 3000);
+}
+
+/* ==================================================================
+   CONFIRM DIALOG
+   ================================================================== */
+function showDialog(title, msg, confirmText, danger, onConfirm) {
+  $("dlgTitle").textContent = title;
+  $("dlgMsg").textContent = msg;
+  $("dlgConfirm").textContent = confirmText;
+  $("dlgConfirm").className = danger ? "danger" : "";
+  $("dlgCancel").textContent = T[LANG].cancel;
+  dialogAction = onConfirm;
+  $("dialogOverlay").classList.add("open");
+}
+function closeDialog() {
+  $("dialogOverlay").classList.remove("open");
+  dialogAction = null;
+}
+
+/* ==================================================================
+   TOGGLE AVAILABILITY (in-place update for smoothness)
+   ================================================================== */
+function toggleActive(id) {
+  const p = working.find((x) => x.id === id);
+  if (!p) return;
+  p.active = !p.active;
+  const row = $("list").querySelector('.prow[data-id="' + id + '"]');
+  if (row) {
+    const tog = row.querySelector(".toggle");
+    tog.setAttribute("aria-checked", String(p.active));
+    row.classList.toggle("off", !p.active);
+  }
+  onChange();
+}
+
+/* ==================================================================
+   ADD / EDIT SHEET
+   ================================================================== */
+function buildEmojiSuggest() {
+  $("emojiSuggest").innerHTML = EMOJI_SUGGEST
+    .map((e) => `<button type="button" data-emoji="${esc(e)}">${esc(e)}</button>`).join("");
+}
+function buildCatChips() {
+  const cats = orderedCats();
+  const ids = cats.length ? cats : CATEGORIES.map((c) => c.id);
+  $("catChips").innerHTML = ids.map((id) => {
+    const on = id === draftCat;
+    return `<button type="button" data-cat="${esc(id)}" class="${on ? "sel" : ""}"
+             style="${on ? `background:${catColor(id)}` : ""}">
+             ${on ? "" : `<span class="cdot" style="background:${catColor(id)}"></span>`}
+             ${esc(catLabel(id))}</button>`;
+  }).join("");
+}
+function setDraftCat(id) { draftCat = id; buildCatChips(); }
+function setDraftUnit(u) {
+  draftUnit = u;
+  $("unitSeg").querySelectorAll("button").forEach((b) =>
+    b.classList.toggle("sel", b.dataset.unit === u));
+}
+function clearSheetErrors() {
+  ["nameEsErr", "priceErr"].forEach((id) => $(id).classList.remove("show"));
+  $("nameEsField").classList.remove("err");
+  $("priceField").classList.remove("err");
+}
+function openSheet(mode, id) {
+  sheetMode = mode;
+  editingId = id || null;
+  clearSheetErrors();
+  buildEmojiSuggest();
+  $("curPrefix").textContent = CONFIG.currency;
+
+  if (mode === "edit") {
+    const p = working.find((x) => x.id === id);
+    if (!p) return;
+    $("sheetTitle").textContent = T[LANG].editTitle;
+    $("emojiField").value = p.emoji || "";
+    $("nameEsField").value = p.es || "";
+    $("nameEnField").value = p.en || "";
+    draftCat = p.cat;
+    setDraftUnit(p.unit);
+    $("priceField").value = p.price != null ? p.price : "";
+    $("deleteBtn").classList.remove("hidden");
+  } else {
+    $("sheetTitle").textContent = T[LANG].addTitle;
+    $("emojiField").value = "";
+    $("nameEsField").value = "";
+    $("nameEnField").value = "";
+    draftCat = (activeCat !== "__all__") ? activeCat : (orderedCats()[0] || CATEGORIES[0].id);
+    setDraftUnit("kg");
+    $("priceField").value = "";
+    $("deleteBtn").classList.add("hidden");
+  }
+  buildCatChips();
+  $("overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+  setTimeout(() => $("nameEsField").focus(), 250);
+}
+function closeSheet() {
+  $("overlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+function saveSheet() {
+  clearSheetErrors();
+  const es = $("nameEsField").value.trim();
+  const en = $("nameEnField").value.trim();
+  const emoji = $("emojiField").value.trim() || "🛒";
+  const priceRaw = $("priceField").value.replace(",", ".").trim();
+  const price = parseFloat(priceRaw);
+
+  let ok = true;
+  if (!es) {
+    $("nameEsErr").textContent = T[LANG].errName;
+    $("nameEsErr").classList.add("show");
+    $("nameEsField").classList.add("err");
+    ok = false;
+  }
+  if (isNaN(price) || price <= 0) {
+    $("priceErr").textContent = T[LANG].errPrice;
+    $("priceErr").classList.add("show");
+    $("priceField").classList.add("err");
+    ok = false;
+  }
+  if (!ok) return;
+
+  const data = {
+    cat: draftCat,
+    es: es,
+    en: en || es,                     // EN auto-suggested = ES if empty
+    emoji: emoji,
+    unit: draftUnit,
+    price: Math.round(price * 100) / 100,
+  };
+
+  if (sheetMode === "edit") {
+    const p = working.find((x) => x.id === editingId);
+    if (p) Object.assign(p, data); // keep id + active
+  } else {
+    working.push(Object.assign({ id: newId(), active: true }, data));
+  }
+  closeSheet();
+  renderAll();
+  onChange();
+  toast(T[LANG].saved, "ok");
+}
+function deleteCurrent() {
+  const p = working.find((x) => x.id === editingId);
+  if (!p) return;
+  const name = LANG === "es" ? p.es : (p.en || p.es);
+  showDialog(T[LANG].delTitle(name), T[LANG].delMsg, T[LANG].delOk, true, () => {
+    working = working.filter((x) => x.id !== editingId);
+    closeDialog();
+    closeSheet();
+    renderAll();
+    onChange();
+    toast(T[LANG].deleted, "ok");
+  });
+}
+
+/* ==================================================================
+   PUBLISH FLOW
+   ================================================================== */
+let successTimer = null;
+async function doPublish() {
+  clearTimeout(successTimer);
+  pubState = "publishing";
+  renderPubbar();
+  try {
+    await publishChanges({ products: deepCopy(working) });
+    published = deepCopy(working);   // new baseline
+    clearDraft();
+    pubState = "success";
+    renderPubbar();
+    renderCount();
+    successTimer = setTimeout(() => {
+      if (pubState === "success") { pubState = "idle"; renderPubbar(); }
+    }, 3200);
+  } catch (e) {
+    // NEVER lose changes — keep working + draft intact, offer retry.
+    pubState = "fail";
+    renderPubbar();
+  }
+}
+
+/* ==================================================================
+   RESTORE PREVIOUS VERSION
+   ================================================================== */
+function askRestore() {
+  $("menu").classList.add("hidden");
+  showDialog(T[LANG].restoreTitle, T[LANG].restoreMsg, T[LANG].restoreOk, false, async () => {
+    closeDialog();
+    pubState = "publishing";
+    renderPubbar();
+    try {
+      const data = await restorePrevious();
+      seedCatalog(data.products || []);
+      clearDraft();
+      pubState = "idle";
+      activeCat = "__all__";
+      query = ""; $("search").value = ""; $("searchClear").style.display = "none";
+      renderAll();
+      toast(T[LANG].restored, "ok");
+    } catch (e) {
+      pubState = "idle";
+      renderPubbar();
+      toast(T[LANG].restoreFail, "err");
+    }
+  });
+}
+
+/* ==================================================================
+   CATALOG SEEDING
+   ================================================================== */
+function seedCatalog(products) {
+  // Assign stable ids to the published baseline.
+  published = products.map((p, i) => Object.assign({ id: "p" + i }, deepCopy(p)));
+  working = deepCopy(published);
+}
+
+/* ==================================================================
+   LOAD FLOW (loading / error / success states)
+   ================================================================== */
+async function loadFlow() {
+  $("list").innerHTML =
+    `<div class="list-msg"><div class="spinner"></div>${esc(T[LANG].loading)}</div>`;
+  try {
+    const data = await loadCatalog();
+    seedCatalog((data && data.products) || []);
+
+    // Restore any locally-saved draft so unpublished changes survive reopen.
+    const draft = loadDraft();
+    if (draft && draft.length >= 0) {
+      // Only adopt the draft if it actually differs from the published baseline.
+      working = draft;
+      if (pendingCount() === 0) clearDraft();
+    }
+    renderAll();
+  } catch (e) {
+    $("list").innerHTML =
+      `<div class="list-msg">⚠️ ${esc(T[LANG].loadFail)}<br>
+        <button class="btn-retry" id="loadRetry">${esc(T[LANG].retry)}</button></div>`;
+    $("loadRetry").onclick = loadFlow;
+  }
+}
+
+/* ==================================================================
+   LANGUAGE TOGGLE
+   ================================================================== */
+function toggleLang() {
+  LANG = LANG === "es" ? "en" : "es";
+  applyStaticLang();
+  // Re-render dynamic surfaces if the app is visible.
+  if (!$("app").classList.contains("hidden")) renderAll();
+  // If the sheet is open, refresh its dynamic labels.
+  if ($("overlay").classList.contains("open")) {
+    $("sheetTitle").textContent = sheetMode === "edit" ? T[LANG].editTitle : T[LANG].addTitle;
+    buildCatChips();
+  }
+}
+
+/* ==================================================================
+   UNLOCK
+   ================================================================== */
+async function doUnlock() {
+  const pin = $("pin").value.trim();
+  $("pinErr").textContent = "";
+  $("pin").classList.remove("err");
+  if (!pin) { $("pinErr").textContent = T[LANG].pinEmpty; return; }
+
+  const btn = $("unlockBtn");
+  btn.disabled = true;
+  btn.querySelector("span").textContent = T[LANG].entering;
+  try {
+    const ok = await verifyPin(pin);
+    if (ok) {
+      $("unlock").classList.add("hidden");
+      $("app").classList.remove("hidden");
+      $("fab").classList.remove("hidden");
+      loadFlow();
+    } else {
+      $("pin").classList.add("err");
+      $("pinErr").textContent = T[LANG].pinErr;
+      $("pin").value = "";
+      $("pin").focus();
+    }
+  } catch (e) {
+    $("pinErr").textContent = T[LANG].pinErr;
+  } finally {
+    btn.disabled = false;
+    btn.querySelector("span").textContent = T[LANG].enter;
+  }
+}
+
+/* ==================================================================
+   EVENT BINDING
+   ================================================================== */
+function bindEvents() {
+  // --- Unlock ---
+  $("unlockBtn").addEventListener("click", doUnlock);
+  $("pin").addEventListener("keydown", (e) => { if (e.key === "Enter") doUnlock(); });
+  $("pin").addEventListener("input", () => {
+    $("pin").value = $("pin").value.replace(/\D/g, "");
+  });
+  $("uLang").addEventListener("click", toggleLang);
+
+  // --- Header ---
+  $("langBtn").addEventListener("click", toggleLang);
+  $("menuBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    $("menu").classList.toggle("hidden");
+  });
+  $("restoreBtn").addEventListener("click", askRestore);
+  document.addEventListener("click", (e) => {
+    if (!$("menu").classList.contains("hidden") &&
+        !e.target.closest("#menu") && !e.target.closest("#menuBtn")) {
+      $("menu").classList.add("hidden");
+    }
+  });
+
+  // --- Search ---
+  $("search").addEventListener("input", (e) => {
+    query = e.target.value;
+    $("searchClear").style.display = query ? "flex" : "none";
+    renderList();
+  });
+  $("searchClear").addEventListener("click", () => {
+    query = ""; $("search").value = ""; $("searchClear").style.display = "none";
+    $("search").focus(); renderList();
+  });
+
+  // --- Chips (delegated) ---
+  $("chips").addEventListener("click", (e) => {
+    const b = e.target.closest(".chip");
+    if (!b) return;
+    activeCat = b.dataset.cat;
+    renderChips();
+    renderList();
+  });
+
+  // --- Product list (delegated: toggle vs open-edit) ---
+  $("list").addEventListener("click", (e) => {
+    const tog = e.target.closest("[data-toggle]");
+    if (tog) { toggleActive(tog.getAttribute("data-toggle")); return; }
+    const row = e.target.closest(".prow");
+    if (row) openSheet("edit", row.getAttribute("data-id"));
+  });
+
+  // --- FAB ---
+  $("fab").addEventListener("click", () => openSheet("add"));
+
+  // --- Sheet ---
+  $("sheetClose").addEventListener("click", closeSheet);
+  $("saveBtn").addEventListener("click", saveSheet);
+  $("deleteBtn").addEventListener("click", deleteCurrent);
+  $("overlay").addEventListener("click", (e) => { if (e.target.id === "overlay") closeSheet(); });
+  $("emojiSuggest").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-emoji]");
+    if (b) $("emojiField").value = b.dataset.emoji;
+  });
+  $("catChips").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-cat]");
+    if (b) setDraftCat(b.dataset.cat);
+  });
+  $("unitSeg").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-unit]");
+    if (b) setDraftUnit(b.dataset.unit);
+  });
+  // price: allow digits + one decimal point
+  $("priceField").addEventListener("input", (e) => {
+    let v = e.target.value.replace(",", ".").replace(/[^\d.]/g, "");
+    const i = v.indexOf(".");
+    if (i !== -1) v = v.slice(0, i + 1) + v.slice(i + 1).replace(/\./g, "");
+    e.target.value = v;
+  });
+
+  // --- Dialog ---
+  $("dlgCancel").addEventListener("click", closeDialog);
+  $("dlgConfirm").addEventListener("click", () => { if (dialogAction) dialogAction(); });
+  $("dialogOverlay").addEventListener("click", (e) => { if (e.target.id === "dialogOverlay") closeDialog(); });
+}
+
+/* ==================================================================
+   INIT
+   ================================================================== */
+function init() {
+  $("uLogo").textContent = CONFIG.logo;
+  $("hLogo").textContent = CONFIG.logo;
+  $("uStore").textContent = CONFIG.storeName;
+  $("hStore").textContent = CONFIG.storeName;
+  document.title = CONFIG.storeName + " · Mi Tienda";
+  applyStaticLang();
+  bindEvents();
+  setTimeout(() => $("pin").focus(), 200);
+}
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
