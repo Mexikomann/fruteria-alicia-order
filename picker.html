@@ -416,12 +416,37 @@ const T = {
   }
 };
 let LANG = "es";
+try{
+  const savedLang = localStorage.getItem("picker_lang");
+  if(savedLang === "en" || savedLang === "es") LANG = savedLang;
+}catch(e){}
 const t = (k,...a)=>{ const v = T[LANG][k]; return typeof v==="function" ? v(...a) : v; };
 
 /* ---------- Small helpers ---------- */
 const $ = (s,r)=> (r||document).querySelector(s);
 const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
+/* Accent- and case-insensitive text for matching ("platano" finds "Plátano"). */
+const normQ = s => String(s==null?"":s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+
+/* Product name translation map (populated from catalogue) */
+const nameEnMap = {};
+function buildCatalogMap(items){
+  if(!Array.isArray(items)) return;
+  items.forEach(p=>{
+    if(!p) return;
+    const es = p.name || p.es;
+    const en = p.name_en || p.en;
+    if(es && en) nameEnMap[normQ(es)] = en;
+  });
+}
+function prodName(name){
+  if(LANG === "en" && name){
+    const en = nameEnMap[normQ(name)];
+    if(en) return en;
+  }
+  return name || "";
+}
 
 /* Money is ALWAYS integer cents. Quantities are handled as integer hundredths
    (1.35 kg -> 135) so no float arithmetic ever touches pesos. */
@@ -516,23 +541,29 @@ async function mockSubmit(orderId,result){
 }
 /* Store catalogue for the substitute picker — real items from products.json. */
 const MOCK_CATALOG = [
-  { name:"Aguacate",            unit:"kg",  price_cents:6500, emoji:"🥑", cat:"frutas" },
-  { name:"Plátano",             unit:"kg",  price_cents:2200, emoji:"🍌", cat:"frutas" },
-  { name:"Mango Ataulfo",       unit:"kg",  price_cents:5500, emoji:"🥭", cat:"frutas" },
-  { name:"Papaya",              unit:"kg",  price_cents:3500, emoji:"🍈", cat:"frutas" },
-  { name:"Piña",                unit:"kg",  price_cents:3000, emoji:"🍍", cat:"frutas" },
-  { name:"Fresa",               unit:"kg",  price_cents:8000, emoji:"🍓", cat:"frutas" },
-  { name:"Cilantro",            unit:"pza", price_cents:1000, emoji:"🌿", cat:"verduras" },
-  { name:"Lechuga",             unit:"pza", price_cents:1800, emoji:"🥬", cat:"verduras" },
-  { name:"Zanahoria",           unit:"kg",  price_cents:2800, emoji:"🥕", cat:"verduras" },
-  { name:"Leche Lala 1L",       unit:"pza", price_cents:2800, emoji:"🥛", cat:"lacteos" },
-  { name:"Yogurt Natural",      unit:"pza", price_cents:2500, emoji:"🥣", cat:"lacteos" },
-  { name:"Tortillas de Harina", unit:"pza", price_cents:2200, emoji:"🌮", cat:"abarrotes" },
-  { name:"Arroz",               unit:"kg",  price_cents:2400, emoji:"🍚", cat:"abarrotes" },
-  { name:"Agua Bonafont 1L",    unit:"pza", price_cents:1500, emoji:"💧", cat:"bebidas" },
-  { name:"Jamaica 1L",          unit:"pza", price_cents:2200, emoji:"🌺", cat:"bebidas" },
-  { name:"Sabritas",            unit:"pza", price_cents:2300, emoji:"🥔", cat:"botanas" },
-  { name:"Cacahuate",           unit:"pza", price_cents:1200, emoji:"🥜", cat:"botanas" }
+  { name:"Aguacate",            name_en:"Avocado",          unit:"kg",  price_cents:6500,  emoji:"🥑", cat:"frutas" },
+  { name:"Plátano",             name_en:"Banana",           unit:"kg",  price_cents:2200,  emoji:"🍌", cat:"frutas" },
+  { name:"Mango Ataulfo",       name_en:"Ataulfo Mango",    unit:"kg",  price_cents:5500,  emoji:"🥭", cat:"frutas" },
+  { name:"Papaya",              name_en:"Papaya",           unit:"kg",  price_cents:3500,  emoji:"🍈", cat:"frutas" },
+  { name:"Piña",                name_en:"Pineapple",        unit:"kg",  price_cents:3000,  emoji:"🍍", cat:"frutas" },
+  { name:"Fresa",               name_en:"Strawberry",       unit:"kg",  price_cents:8000,  emoji:"🍓", cat:"frutas" },
+  { name:"Limón",               name_en:"Lime",             unit:"kg",  price_cents:3500,  emoji:"🍋", cat:"frutas" },
+  { name:"Manzana Roja",        name_en:"Red Apple",        unit:"kg",  price_cents:4500,  emoji:"🍎", cat:"frutas" },
+  { name:"Cilantro",            name_en:"Cilantro",         unit:"pza", price_cents:1000,  emoji:"🌿", cat:"verduras" },
+  { name:"Lechuga",             name_en:"Lettuce",          unit:"pza", price_cents:1800,  emoji:"🥬", cat:"verduras" },
+  { name:"Zanahoria",           name_en:"Carrot",           unit:"kg",  price_cents:2800,  emoji:"🥕", cat:"verduras" },
+  { name:"Jitomate",            name_en:"Tomato",           unit:"kg",  price_cents:3800,  emoji:"🍅", cat:"verduras" },
+  { name:"Cebolla Blanca",      name_en:"White Onion",      unit:"kg",  price_cents:2500,  emoji:"🧅", cat:"verduras" },
+  { name:"Leche Lala 1L",       name_en:"Milk Lala 1L",     unit:"pza", price_cents:2800,  emoji:"🥛", cat:"lacteos" },
+  { name:"Queso Fresco",        name_en:"Fresh Cheese",     unit:"kg",  price_cents:12000, emoji:"🧀", cat:"lacteos" },
+  { name:"Huevo San Juan",      name_en:"Eggs (San Juan)",  unit:"pza", price_cents:6200,  emoji:"🥚", cat:"lacteos" },
+  { name:"Yogurt Natural",      name_en:"Plain Yogurt",     unit:"pza", price_cents:2500,  emoji:"🥣", cat:"lacteos" },
+  { name:"Tortillas de Harina", name_en:"Flour Tortillas",  unit:"pza", price_cents:2200,  emoji:"🌮", cat:"abarrotes" },
+  { name:"Arroz",               name_en:"Rice",             unit:"kg",  price_cents:2400,  emoji:"🍚", cat:"abarrotes" },
+  { name:"Agua Bonafont 1L",    name_en:"Bonafont Water 1L",unit:"pza", price_cents:1500,  emoji:"💧", cat:"bebidas" },
+  { name:"Jamaica 1L",          name_en:"Hibiscus 1L",      unit:"pza", price_cents:2200,  emoji:"🌺", cat:"bebidas" },
+  { name:"Sabritas",            name_en:"Potato Chips",     unit:"pza", price_cents:2300,  emoji:"🥔", cat:"botanas" },
+  { name:"Cacahuate",           name_en:"Peanuts",          unit:"pza", price_cents:1200,  emoji:"🥜", cat:"botanas" }
 ];
 async function mockLoadCatalog(){
   await sleep(250);
@@ -544,6 +575,7 @@ async function mockLoadCatalog(){
    exactly like this; the UI only talks to the network through them.
    ===================================================================== */
 const USE_MOCK = true;   // HERMES: set to false once the four stubs below are wired.
+if(USE_MOCK) buildCatalogMap(MOCK_CATALOG);
 
 /** Return the pending orders as an array of OrderSummary:
  *  { id, created_at:"YYYY-MM-DD HH:MM:SS", payment_method:"cash"|"card",
@@ -563,7 +595,7 @@ async function loadOrder(orderId) {}
 async function submitPicked(orderId, result) {}
 
 /** Return the store catalogue the picker can choose substitutes from (HERMES: wire to products.json):
- *  [{ name, unit:"kg"|"pza", price_cents, emoji, cat }]
+ *  [{ name, name_en, unit:"kg"|"pza", price_cents, emoji, cat }]
  *  Throw (reject) on failure — the substitute dialog shows an error with "Reintentar". */
 async function loadCatalog() {}
 
@@ -592,7 +624,8 @@ async function fetchCatalog(){
   if(catalogCache) return catalogCache;
   const r = USE_MOCK ? await mockLoadCatalog() : await loadCatalog();
   if(!Array.isArray(r)) throw new Error("bad catalog");
-  catalogCache = r.filter(p=> p && p.name && p.price_cents>0);   // only real, priced products can substitute
+  catalogCache = r.filter(p=> p && (p.name || p.es) && ((p.price_cents && p.price_cents>0) || (p.price && p.price>0)));   // only real, priced products can substitute
+  buildCatalogMap(catalogCache);
   return catalogCache;
 }
 
@@ -776,13 +809,13 @@ function itemHTML(l){
   let chip;
   if(s.st==="listo") chip = t("stDone");
   else if(s.st==="cambiado") chip = t("stChanged",fmtQty(s.qty),u);
-  else if(s.st==="nohay") chip = hasSub(s) ? t("stNoSub",s.sub,s.subPrice) : t("stNoRemove");
+  else if(s.st==="nohay") chip = hasSub(s) ? t("stNoSub",prodName(s.sub),s.subPrice) : t("stNoRemove");
   else chip = t("pending");
   const price = (s.st==="nohay" && !hasSub(s)) ? "—" : money(lineCentsNow(l,s));
   return '<article class="item st-'+s.st+'" data-id="'+esc(l.id)+'">'+
     '<div class="item-top">'+
       '<div class="emo" aria-hidden="true">'+esc(l.emoji)+'<span class="tick">✓</span></div>'+
-      '<div class="info"><div class="pname">'+esc(l.product_name)+'</div>'+
+      '<div class="info"><div class="pname">'+esc(prodName(l.product_name))+'</div>'+
         '<div class="req">'+esc(t("requested"))+': '+esc(fmtQty(l.quantity))+' '+esc(u)+'</div>'+
         '<div class="chip">'+esc(chip)+'</div></div>'+
       '<div class="lt">'+esc(price)+'</div>'+
@@ -860,7 +893,7 @@ function openChange(id){
     return n;
   };
   const sheet = openModal(
-    '<h2 id="mTitle">'+esc(l.emoji)+' '+esc(l.product_name)+'</h2>'+
+    '<h2 id="mTitle">'+esc(l.emoji)+' '+esc(prodName(l.product_name))+'</h2>'+
     '<p class="sub">'+esc(t("changeTitle"))+' · '+esc(t("changeAsked",fmtQty(l.quantity),u))+'</p>'+
     '<div class="stepper">'+
       '<button type="button" class="sbtn" data-m="minus" aria-label="'+esc(t("less"))+'">−</button>'+
@@ -901,16 +934,13 @@ function openChange(id){
   inp.focus(); try{ inp.select(); }catch(e){}
 }
 
-/* Accent- and case-insensitive text for matching ("platano" finds "Plátano"). */
-const normQ = s => String(s==null?"":s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
-
 function openNoHay(id){
   const l = lineById(id), s = view.st[id];
   let mode = (s.st==="nohay" && !hasSub(s)) ? "remove" : "replace";
   let chosen = (s.st==="nohay" && hasSub(s)) ? {name:s.sub, unit:s.subUnit, price_cents:s.subPrice} : null;
   let items = null, cstat = "loading", shown = [];
   const sheet = openModal(
-    '<h2 id="mTitle">'+esc(l.emoji)+' '+esc(l.product_name)+'</h2>'+
+    '<h2 id="mTitle">'+esc(l.emoji)+' '+esc(prodName(l.product_name))+'</h2>'+
     '<p class="sub">'+esc(t("nohayTitle"))+'</p>'+
     '<label class="opt" id="optReplace"><input type="radio" name="mode" value="replace"><span>'+esc(t("replaceBy"))+'</span></label>'+
     '<div class="subwrap" id="subWrap">'+
@@ -952,7 +982,7 @@ function openNoHay(id){
     const box = $("#subChosen",sheet);
     box.hidden = !chosen;
     if(chosen){
-      box.textContent = t("subChosen",chosen.name,chosen.price_cents,chosen.unit?unitLabel(chosen.unit):"");
+      box.textContent = t("subChosen",prodName(chosen.name),chosen.price_cents,chosen.unit?unitLabel(chosen.unit):"");
       try{ box.scrollIntoView({block:"nearest",behavior:"smooth"}); }catch(e){}
     }
   }
@@ -964,10 +994,10 @@ function openNoHay(id){
       return;
     }
     const q = normQ(inp.value), own = normQ(l.product_name);
-    shown = items.filter(p=> normQ(p.name)!==own && (!q || normQ(p.name).indexOf(q)>=0));
+    shown = items.filter(p=> normQ(p.name)!==own && (!q || normQ(p.name).indexOf(q)>=0 || (p.name_en && normQ(p.name_en).indexOf(q)>=0)));
     box.innerHTML = shown.length ? shown.map((p,i)=>
       '<button type="button" class="srow'+(chosen && chosen.name===p.name?' sel':'')+'" data-m="pick" data-i="'+i+'">'+
-        '<span class="sem" aria-hidden="true">'+esc(p.emoji)+'</span><span class="sn2">'+esc(p.name)+'</span>'+
+        '<span class="sem" aria-hidden="true">'+esc(p.emoji)+'</span><span class="sn2">'+esc(prodName(p.name))+'</span>'+
         '<span class="sp">'+esc(money(p.price_cents))+(p.unit?'<small> / '+esc(unitLabel(p.unit))+'</small>':'')+'</span></button>'
     ).join("") : '<div class="sempty">'+esc(t("noResults"))+'</div>';
     if(chosen){
@@ -1003,7 +1033,7 @@ function openNoHay(id){
 function openNote(id){
   const l = lineById(id), s = view.st[id];
   const sheet = openModal(
-    '<h2 id="mTitle">'+esc(l.emoji)+' '+esc(l.product_name)+'</h2>'+
+    '<h2 id="mTitle">'+esc(l.emoji)+' '+esc(prodName(l.product_name))+'</h2>'+
     '<p class="sub">'+esc(t("noteTitle"))+'</p>'+
     '<textarea class="txt" id="noteIn" maxlength="200" placeholder="'+esc(t("notePh"))+'" aria-label="'+esc(t("noteTitle"))+'">'+esc(s.note)+'</textarea>'+
     '<div class="mact"><button type="button" class="btn sec" data-m="cancel">'+esc(t("cancel"))+'</button>'+
@@ -1039,9 +1069,9 @@ function openSummary(){
     const s = view.st[l.id], u = unitLabel(l.unit);
     let detail = "";
     if(s.st==="cambiado") detail = t("sumChanged",fmtQty(l.quantity),fmtQty(s.qty),u);
-    else if(s.st==="nohay") detail = hasSub(s) ? t("sumNoSub",s.sub,s.subPrice,lineCentsNow(l,s)) : t("sumNoRemove");
+    else if(s.st==="nohay") detail = hasSub(s) ? t("sumNoSub",prodName(s.sub),s.subPrice,lineCentsNow(l,s)) : t("sumNoRemove");
     if(!detail && !s.note) return;
-    rows.push('<div class="sumrow"><b>'+esc(l.emoji)+' '+esc(l.product_name)+'</b>'+
+    rows.push('<div class="sumrow"><b>'+esc(l.emoji)+' '+esc(prodName(l.product_name))+'</b>'+
       (detail?'<div>'+esc(detail)+'</div>':'')+
       (s.note?'<div class="sn">💬 '+esc(s.note)+'</div>':'')+'</div>');
   });
@@ -1179,6 +1209,7 @@ function applyLang(){
 }
 $("#langBtn").addEventListener("click",()=>{
   LANG = LANG==="es" ? "en" : "es";
+  try{ localStorage.setItem("picker_lang", LANG); }catch(e){}
   applyLang();
   const y = window.scrollY;
   redraw();
