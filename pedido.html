@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fruteria Alicia · Pedidos</title>
+<meta property="og:title" content="Fruteria Alicia · Pedidos en Línea">
+<meta property="og:description" content="🛒 Toca para pedir — Elige frutas, verduras, lácteos y más. Envío a domicilio en Mazatlán. ¡Pide por WhatsApp!">
+<meta property="og:image" content="https://mexikomann.github.io/fruteria-alicia-order/og-image.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
+<meta property="og:url" content="https://mexikomann.github.io/fruteria-alicia-order/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Fruteria Alicia · Pedidos en Línea">
+<meta name="twitter:description" content="Haz tu pedido de frutas, verduras, lácteos y más. Envío a domicilio en Mazatlán.">
+<meta name="twitter:image" content="https://mexikomann.github.io/fruteria-alicia-order/og-image.png">
+<style>
+  :root{
+    --green:#2e7d32;
+    --green-light:#66bb6a;
+    --yellow:#f9a825;
+    --orange:#f4511e;
+    --bg:#fffef7;
+    --card:#ffffff;
+    --ink:#33291f;
+    --muted:#7a6d5c;
+    --line:#eadfce;
+    --shadow:0 2px 10px rgba(120,90,30,.12);
+    --cat-frutas:#f4511e;
+    --cat-verduras:#2e7d32;
+    --cat-lacteos:#1e88e5;
+    --cat-abarrotes:#8d6e63;
+    --cat-bebidas:#00acc1;
+    --cat-botanas:#f9a825;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding-bottom:150px;
+    line-height:1.4;
+  }
+  /* Header */
+  header{
+    background:linear-gradient(135deg,var(--green) 0%,var(--green-light) 60%,var(--yellow) 130%);
+    color:#fff;
+    padding:16px 16px 12px;
+    box-shadow:var(--shadow);
+    position:relative;
+  }
+  header h1{margin:0;font-size:22px;letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
+  header p{margin:4px 0 0;font-size:13px;opacity:.92;}
+  #langBtn{
+    position:absolute;top:12px;right:14px;
+    min-width:48px;min-height:48px;
+    background:rgba(255,255,255,.22);
+    border:1px solid rgba(255,255,255,.55);
+    color:#fff;border-radius:24px;
+    padding:0 12px;font-size:14px;font-weight:700;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  #langBtn:active{transform:scale(.95);}
+  /* Tabs */
+  #tabs{
+    position:sticky;top:0;z-index:30;
+    background:var(--bg);
+    display:flex;gap:8px;overflow-x:auto;
+    padding:10px 12px;
+    box-shadow:0 3px 8px rgba(120,90,30,.08);
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  #tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    flex:0 0 auto;
+    border:none;border-radius:24px;
+    min-height:48px;
+    padding:0 18px;font-size:15px;font-weight:700;
+    color:#fff;opacity:.55;cursor:pointer;
+    transition:opacity .15s,transform .1s;
+    white-space:nowrap;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .tab.active{opacity:1;box-shadow:var(--shadow);}
+  .tab:active{transform:scale(.96);}
+  /* Product grid */
+  main{padding:12px;}
+  .cat-title{font-size:18px;font-weight:800;margin:14px 4px 8px;display:flex;align-items:center;gap:8px;}
+  .cat-dot{width:12px;height:12px;border-radius:50%;}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+  }
+  .card{
+    background:var(--card);
+    border:2px solid var(--line);
+    border-radius:16px;
+    padding:12px 8px 10px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s,transform .1s,box-shadow .15s;
+    position:relative;
+    overflow:hidden;
+  }
+  .card:active{transform:scale(.98);}
+  .card.selected{border-color:var(--green);box-shadow:var(--shadow);}
+  .card .emoji{font-size:38px;line-height:1;}
+  .card .name{font-size:15px;font-weight:700;margin-top:6px;min-height:36px;display:flex;align-items:center;justify-content:center;}
+  .card .price{font-size:15px;font-weight:800;color:var(--orange);margin-top:2px;}
+  .card .unit{font-size:12px;color:var(--muted);}
+  .badge{
+    position:absolute;top:6px;right:6px;
+    background:var(--green);color:#fff;
+    min-width:24px;height:24px;border-radius:12px;
+    font-size:12px;font-weight:800;
+    display:none;align-items:center;justify-content:center;padding:0 6px;
+  }
+  .card.selected .badge{display:flex;}
+  /* Qty controls */
+  .qty{
+    margin-top:10px;
+    display:none;
+    align-items:center;justify-content:center;gap:4px;
+  }
+  .card.selected .qty{display:flex;}
+  .qbtn{
+    width:48px;height:48px;min-width:48px;min-height:48px;border-radius:24px;
+    border:none;background:var(--green-light);color:#fff;
+    font-size:22px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    padding:0;
+  }
+  .qbtn:active{transform:scale(.9);}
+  .qty input{
+    width:48px;min-height:48px;text-align:center;
+    font-size:16px;font-weight:700;
+    border:2px solid var(--line);border-radius:10px;
+    padding:6px 2px;
+    -moz-appearance:textfield;
+  }
+  .qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .line-total{font-size:12px;color:var(--muted);margin-top:4px;display:none;}
+  .card.selected .line-total{display:block;}
+  /* Bottom bar */
+  #bottomBar{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:#fff;
+    border-top:2px solid var(--line);
+    box-shadow:0 -4px 14px rgba(120,90,30,.14);
+    padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+    display:flex;align-items:center;gap:12px;
+  }
+  #totalWrap{flex:1;}
+  #totalWrap .lbl{font-size:12px;color:var(--muted);}
+  #totalWrap .amt{font-size:24px;font-weight:900;color:var(--green);}
+  #totalWrap .items{font-size:12px;color:var(--muted);}
+  #sendBtn{
+    background:#25D366;color:#fff;border:none;border-radius:14px;
+    min-height:56px;padding:0 20px;font-size:16px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    box-shadow:var(--shadow);
+  }
+  #sendBtn:disabled{background:#bdbdbd;cursor:not-allowed;box-shadow:none;}
+  #sendBtn:active:not(:disabled){transform:scale(.97);}
+  /* Modal / form */
+  #overlay{
+    position:fixed;inset:0;z-index:50;
+    background:rgba(40,30,15,.5);
+    display:none;align-items:flex-end;justify-content:center;
+  }
+  #overlay.open{display:flex;}
+  #formSheet{
+    background:#fff;width:100%;max-width:520px;
+    border-radius:20px 20px 0 0;
+    padding:18px 18px calc(20px + env(safe-area-inset-bottom));
+    max-height:92vh;overflow-y:auto;
+    animation:slideUp .25s ease;
+  }
+  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  #formSheet h2{margin:0 0 4px;font-size:20px;}
+  #formSheet .sub{font-size:13px;color:var(--muted);margin:0 0 14px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:14px;font-weight:700;margin-bottom:4px;}
+  .field .req{color:var(--orange);}
+  .field input,.field textarea,.field select{
+    width:100%;font-size:16px;
+    border:2px solid var(--line);border-radius:12px;
+    padding:12px;font-family:inherit;background:#fff;
+    min-height:48px;
+  }
+  .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--green-light);}
+  .field textarea{resize:vertical;min-height:56px;}
+  .field-err{
+    color:var(--orange);font-weight:700;font-size:13px;margin-top:4px;
+  }
+  .field-err:empty{display:none;}
+  .pay{display:flex;gap:8px;}
+  .pay label{
+    flex:1;text-align:center;border:2px solid var(--line);border-radius:12px;
+    padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer;margin:0;
+    min-height:48px;display:flex;align-items:center;justify-content:center;
+  }
+  .pay input{display:none;}
+  .pay input:checked + span{color:var(--green);}
+  .pay label:has(input:checked){border-color:var(--green);background:#f1f8e9;}
+  #orderSummary{
+    background:#fbf7ec;border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;margin-bottom:14px;font-size:14px;max-height:180px;overflow-y:auto;
+  }
+  #orderSummary .row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--line);}
+  #orderSummary .row:last-child{border-bottom:none;}
+  #orderSummary .tot{font-weight:900;color:var(--green);padding-top:6px;}
+  .sheet-actions{display:flex;gap:10px;margin-top:14px;}
+  #cancelBtn{
+    flex:0 0 auto;background:#f0e9db;color:var(--ink);border:none;border-radius:14px;
+    min-height:48px;padding:0 18px;font-size:16px;font-weight:700;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  #confirmBtn{
+    flex:1;background:#25D366;color:#fff;border:none;border-radius:14px;
+    min-height:56px;padding:0 14px;font-size:16px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  #confirmBtn:active{transform:scale(.98);}
+  .err{border-color:var(--orange)!important;}
+  .empty-note{text-align:center;color:var(--muted);font-size:14px;padding:20px;}
+  footer{text-align:center;font-size:12px;color:var(--muted);padding:16px;}
+
+  /* Confirmation Area styles */
+  .confirm-banner{
+    background:#eef7ee;border:2px solid var(--green);border-radius:14px;
+    padding:14px;margin:0 0 14px;text-align:center;
+  }
+  .confirm-banner .banner-title{font-size:16px;font-weight:800;color:var(--green);}
+  .confirm-banner .banner-code{font-size:14px;color:var(--ink);margin-top:4px;}
+  .confirm-banner strong{font-size:17px;letter-spacing:0.5px;}
+
+  .code-box{
+    background:#fbf7ec;border:2px dashed var(--green);border-radius:14px;
+    padding:16px;margin:14px 0 18px;text-align:center;
+  }
+  .code-lbl{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+  .order-code{
+    font-size:22px;font-weight:900;color:var(--green);letter-spacing:1px;
+    margin-top:6px;word-break:break-all;user-select:all;
+  }
+  .code-hint{font-size:13px;color:var(--muted);margin-top:8px;}
+  #closeConfirmBtn{
+    width:100%;background:var(--green);color:#fff;border:none;border-radius:14px;
+    min-height:56px;padding:0 20px;font-size:16px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  #closeConfirmBtn:active{transform:scale(.98);}
+</style>
+</head>
+<body>
+
+<header>
+  <button id="langBtn" onclick="toggleLang()" type="button">EN</button>
+  <h1>🍉 Fruteria Alicia</h1>
+  <p data-es="Frescura de Mazatlán a tu puerta 🌴" data-en="Freshness from Mazatlán to your door 🌴">Frescura de Mazatlán a tu puerta 🌴</p>
+</header>
+
+<nav id="tabs"></nav>
+
+<main>
+  <div id="confirmBanner" class="confirm-banner" style="display:none;" role="status">
+    <div class="banner-title">✅ <span data-es="¡Pedido enviado con éxito!" data-en="Order sent successfully!">¡Pedido enviado con éxito!</span></div>
+    <div class="banner-code"><span data-es="Código de pedido:" data-en="Order code:">Código de pedido:</span> <strong id="bannerCode"></strong></div>
+  </div>
+  <div id="catalog"></div>
+</main>
+
+<footer data-es="Pedidos por WhatsApp · Mazatlán, Sinaloa" data-en="Orders via WhatsApp · Mazatlán, Sinaloa">Pedidos por WhatsApp · Mazatlán, Sinaloa</footer>
+
+<div id="bottomBar">
+  <div id="totalWrap">
+    <div class="lbl" data-es="Total del pedido" data-en="Order total">Total del pedido</div>
+    <div class="amt" id="totalAmt">$0.00</div>
+    <div class="items" id="itemCount" data-es="0 productos" data-en="0 items">0 productos</div>
+  </div>
+  <button id="sendBtn" onclick="openForm()" type="button" disabled>
+    <span>📲</span><span data-es="Enviar Pedido" data-en="Send Order">Enviar Pedido</span>
+  </button>
+</div>
+
+<div id="overlay">
+  <div id="formSheet">
+    <div id="formView">
+      <h2 data-es="Completa tu pedido" data-en="Complete your order">Completa tu pedido</h2>
+      <p class="sub" data-es="Revisa y llena tus datos para enviar por WhatsApp." data-en="Review and fill in your details to send via WhatsApp.">Revisa y llena tus datos para enviar por WhatsApp.</p>
+
+      <div id="orderSummary"></div>
+
+      <div class="field">
+        <label><span data-es="Nombre" data-en="Name">Nombre</span> <span class="req">*</span></label>
+        <input type="text" id="fName" autocomplete="name" placeholder="...">
+        <div class="field-err" id="fNameErr"></div>
+      </div>
+      <div class="field">
+        <label><span data-es="Teléfono" data-en="Phone">Teléfono</span> <span class="req">*</span></label>
+        <input type="tel" id="fPhone" autocomplete="tel" inputmode="tel" placeholder="669...">
+        <div class="field-err" id="fPhoneErr"></div>
+      </div>
+      <div class="field">
+        <label data-es="Dirección" data-en="Address">Dirección</label>
+        <input type="text" id="fAddr" autocomplete="street-address" placeholder="...">
+      </div>
+      <div class="field">
+        <label data-es="Notas" data-en="Notes">Notas</label>
+        <textarea id="fNotes" placeholder="..."></textarea>
+      </div>
+      <div class="field">
+        <label data-es="Método de pago" data-en="Payment method">Método de pago</label>
+        <div class="pay">
+          <label><input type="radio" name="pay" value="cash" checked><span data-es="Efectivo" data-en="Cash">Efectivo</span></label>
+          <label><input type="radio" name="pay" value="card"><span data-es="Tarjeta" data-en="Card">Tarjeta</span></label>
+        </div>
+      </div>
+
+      <div class="sheet-actions">
+        <button id="cancelBtn" onclick="closeForm()" type="button" data-es="Volver" data-en="Back">Volver</button>
+        <button id="confirmBtn" onclick="submitOrder()" type="button">
+          <span>✅</span><span data-es="Confirmar y enviar" data-en="Confirm & send">Confirmar y enviar</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="confirmationArea" style="display:none;text-align:center;padding:10px 4px 6px;">
+      <div style="font-size:48px;line-height:1;margin-bottom:12px;">✅</div>
+      <h2 data-es="¡Pedido enviado con éxito!" data-en="Order sent successfully!" style="margin:0 0 8px;font-size:22px;">¡Pedido enviado con éxito!</h2>
+      <p class="sub" data-es="Se abrió WhatsApp para enviar tu mensaje." data-en="WhatsApp opened to send your message." style="margin:0 0 16px;">Se abrió WhatsApp para enviar tu mensaje.</p>
+
+      <div class="code-box">
+        <div class="code-lbl" data-es="Tu código de pedido" data-en="Your order code">Tu código de pedido</div>
+        <div class="order-code" id="orderCode"><span id="confirmCode"></span></div>
+        <div class="code-hint" data-es="Guarda este código para cualquier aclaración." data-en="Keep this code for any inquiries.">Guarda este código para cualquier aclaración.</div>
+      </div>
+
+      <div class="sheet-actions">
+        <button id="closeConfirmBtn" onclick="finishOrder()" type="button">
+          <span data-es="Aceptar / Nuevo pedido" data-en="OK / New order">Aceptar / Nuevo pedido</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- CONFIG ---------- */
+const SHOP_PHONE = "5216721743261"; // WhatsApp destino (MX 52 + 1 + número)
+const CURRENCY = "$";
+
+const CATEGORIES = [
+  {id:"frutas",    es:"Frutas",    en:"Fruits",     color:"var(--cat-frutas)"},
+  {id:"verduras",  es:"Verduras",  en:"Vegetables", color:"var(--cat-verduras)"},
+  {id:"lacteos",   es:"Lácteos",   en:"Dairy",      color:"var(--cat-lacteos)"},
+  {id:"abarrotes", es:"Abarrotes", en:"Groceries",  color:"var(--cat-abarrotes)"},
+  {id:"bebidas",   es:"Bebidas",   en:"Drinks",     color:"var(--cat-bebidas)"},
+  {id:"botanas",   es:"Botanas",   en:"Snacks",     color:"var(--cat-botanas)"},
+];
+
+let PRODUCTS = [];
+
+/* ---------- STATE ---------- */
+let LANG = "es";
+try {
+  const savedLang = localStorage.getItem("pedido_lang");
+  if(savedLang === "en" || savedLang === "es") LANG = savedLang;
+} catch(e){}
+
+const cart = {}; // key -> qty (number)
+
+const T = {
+  es:{
+    items: n => `${n} ${n===1?"producto":"productos"}`,
+    kg: "por kg",
+    pza: "por pza",
+    unitKg: "kg",
+    unitPza: "pza",
+    needName: "Por favor escribe tu nombre.",
+    needPhone: "Por favor escribe tu teléfono.",
+    orderTitle: "*NUEVO PEDIDO — Fruteria Alicia* 🍉",
+    orderHdr: "🛒 *Pedido:*",
+    custHdr: "👤 *Cliente:*",
+    lblCustName: "Nombre",
+    lblCustPhone: "Teléfono",
+    lblCustAddr: "Dirección",
+    lblCustNotes: "Notas",
+    lblCustPay: "Pago",
+    lblTotal: "💰 *TOTAL:*",
+    payCash: "Efectivo",
+    payCard: "Tarjeta"
+  },
+  en:{
+    items: n => `${n} ${n===1?"item":"items"}`,
+    kg: "per kg",
+    pza: "per pc",
+    unitKg: "kg",
+    unitPza: "pc",
+    needName: "Please enter your name.",
+    needPhone: "Please enter your phone.",
+    orderTitle: "*NEW ORDER — Fruteria Alicia* 🍉",
+    orderHdr: "🛒 *Order:*",
+    custHdr: "👤 *Customer:*",
+    lblCustName: "Name",
+    lblCustPhone: "Phone",
+    lblCustAddr: "Address",
+    lblCustNotes: "Notes",
+    lblCustPay: "Payment",
+    lblTotal: "💰 *TOTAL:*",
+    payCash: "Cash",
+    payCard: "Card"
+  }
+};
+
+/* ---------- MONEY & MATH (INTEGER CENTS ONLY) ---------- */
+function money(cents){
+  const c = Math.round(cents), neg = c < 0, a = Math.abs(c);
+  const pesos = String(Math.floor(a / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return (neg ? "-" : "") + CURRENCY + pesos + "." + String(a % 100).padStart(2, "0");
+}
+
+const toHundredths = q => Math.round(q * 100);
+const lineCents = (unitCents, q) => Math.round(unitCents * toHundredths(q) / 100);
+
+/* ---------- LOCAL STORAGE HELPERS ---------- */
+function saveCart(){
+  try{
+    localStorage.setItem("pedido_cart", JSON.stringify(cart));
+  }catch(e){}
+}
+
+function loadCartFromStorage(){
+  try{
+    const raw = localStorage.getItem("pedido_cart");
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(parsed && typeof parsed === "object"){
+        for(const k in parsed){
+          const q = Number(parsed[k]);
+          if(PRODUCTS[k] && !isNaN(q) && q > 0){
+            cart[k] = q;
+          }
+        }
+      }
+    }
+  }catch(e){}
+}
+
+function clearCart(){
+  for(const k in cart) delete cart[k];
+  try{
+    localStorage.removeItem("pedido_cart");
+  }catch(e){}
+  document.querySelectorAll(".card.selected").forEach(card=>{
+    card.classList.remove("selected");
+    const inp = card.querySelector('input');
+    if(inp) inp.value = "";
+    const badge = card.querySelector('.badge');
+    if(badge) badge.textContent = "";
+    const lt = card.querySelector('.line-total');
+    if(lt) lt.textContent = "";
+  });
+  refreshTotals();
+}
+
+/* ---------- RENDER ---------- */
+function buildTabs(){
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = "";
+  CATEGORIES.forEach((c,idx)=>{
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "tab" + (idx===0?" active":"");
+    b.style.background = c.color;
+    b.dataset.target = "cat-"+c.id;
+    b.textContent = LANG==="es"?c.es:c.en;
+    b.onclick = ()=>{
+      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+      b.classList.add("active");
+      const el = document.getElementById("cat-"+c.id);
+      if(!el) return;
+      const tabsH = nav.offsetHeight;
+      const y = el.getBoundingClientRect().top + window.scrollY - tabsH - 8;
+      window.scrollTo({top:y, behavior:"smooth"});
+    };
+    nav.appendChild(b);
+  });
+}
+
+function buildCatalog(){
+  const main = document.getElementById("catalog");
+  main.innerHTML = "";
+  CATEGORIES.forEach(c=>{
+    const section = document.createElement("section");
+    section.id = "cat-"+c.id;
+    const title = document.createElement("div");
+    title.className = "cat-title";
+    title.innerHTML = `<span class="cat-dot" style="background:${c.color}"></span>${LANG==="es"?c.es:c.en}`;
+    section.appendChild(title);
+
+    const grid = document.createElement("div");
+    grid.className = "grid";
+    PRODUCTS.filter(p=>p.cat===c.id).forEach(p=>{
+      grid.appendChild(makeCard(p));
+    });
+    section.appendChild(grid);
+    main.appendChild(section);
+  });
+}
+
+function makeCard(p){
+  const card = document.createElement("div");
+  card.className = "card";
+  card.id = "card-"+p._id;
+  const name = LANG==="es"?p.es:p.en;
+  const unitLbl = p.unit==="kg" ? T[LANG].kg : T[LANG].pza;
+  card.innerHTML = `
+    <div class="badge" id="badge-${p._id}"></div>
+    <div class="emoji">${p.emoji}</div>
+    <div class="name">${name}</div>
+    <div class="price">${money(p.cents)}</div>
+    <div class="unit">${unitLbl}</div>
+    <div class="qty">
+      <button class="qbtn" data-act="dec" type="button">−</button>
+      <input type="text" inputmode="decimal" id="qin-${p._id}" value="">
+      <button class="qbtn" data-act="inc" type="button">+</button>
+    </div>
+    <div class="line-total" id="lt-${p._id}"></div>
+  `;
+  card.addEventListener("click",(e)=>{
+    if(e.target.closest(".qty")) return;
+    if(cart[p._id]===undefined) setQty(p, defaultStep(p));
+    else removeItem(p);
+  });
+  card.querySelector('[data-act="inc"]').addEventListener("click",()=>step(p,+1));
+  card.querySelector('[data-act="dec"]').addEventListener("click",()=>step(p,-1));
+  const input = card.querySelector("input");
+  input.addEventListener("input",()=>onType(p,input));
+  input.addEventListener("blur",()=>normalize(p,input));
+  return card;
+}
+
+function defaultStep(p){ return p.unit==="kg" ? 0.5 : 1; }
+
+function step(p,dir){
+  const cur = cart[p._id] ?? 0;
+  const inc = p.unit==="kg" ? 0.5 : 1;
+  let next = Math.round((cur + dir*inc)*100)/100;
+  if(next<=0){ removeItem(p); return; }
+  setQty(p,next);
+}
+
+function onType(p,input){
+  let raw = input.value.replace(",",".");
+  if(p.unit==="pza") raw = raw.replace(/[^\d]/g,"");
+  else raw = raw.replace(/[^\d.]/g,"");
+  input.value = raw;
+  const val = parseFloat(raw);
+  if(!isNaN(val) && val>0){
+    cart[p._id] = p.unit==="pza" ? Math.floor(val) : val;
+    saveCart();
+    refreshLine(p);
+    refreshTotals();
+  }
+}
+
+function normalize(p,input){
+  const val = parseFloat(input.value.replace(",","."));
+  if(isNaN(val) || val<=0){ removeItem(p); return; }
+  setQty(p, p.unit==="pza"?Math.floor(val):Math.round(val*100)/100);
+}
+
+function setQty(p,qty){
+  cart[p._id]=qty;
+  saveCart();
+  const card=document.getElementById("card-"+p._id);
+  if(card){
+    card.classList.add("selected");
+    const input=document.getElementById("qin-"+p._id);
+    if(input) input.value = p.unit==="kg" ? qty : String(qty);
+    refreshLine(p);
+  }
+  refreshTotals();
+}
+
+function removeItem(p){
+  delete cart[p._id];
+  saveCart();
+  const card=document.getElementById("card-"+p._id);
+  if(card){
+    card.classList.remove("selected");
+    const input=document.getElementById("qin-"+p._id);
+    if(input) input.value="";
+    refreshLine(p);
+  }
+  refreshTotals();
+}
+
+function refreshLine(p){
+  const qty=cart[p._id];
+  const badge=document.getElementById("badge-"+p._id);
+  const lt=document.getElementById("lt-"+p._id);
+  if(!badge || !lt) return;
+  if(qty===undefined){ badge.textContent=""; lt.textContent=""; return; }
+  const unit = p.unit==="kg" ? T[LANG].unitKg : T[LANG].unitPza;
+  badge.textContent = p.unit==="kg" ? qty : qty;
+  const subCents = lineCents(p.cents, qty);
+  lt.textContent = `${qty} ${unit} × ${money(p.cents)} = ${money(subCents)}`;
+}
+
+function refreshTotals(){
+  let totalCents=0, count=0;
+  for(const id in cart){
+    const p=PRODUCTS[id];
+    if(!p) continue;
+    totalCents += lineCents(p.cents, cart[id]);
+    count++;
+  }
+  document.getElementById("totalAmt").textContent = money(totalCents);
+  const ic=document.getElementById("itemCount");
+  ic.textContent = T[LANG].items(count);
+  document.getElementById("sendBtn").disabled = count===0;
+}
+
+function restoreCartUI(){
+  for(const id in cart){
+    const p=PRODUCTS[id];
+    if(!p) continue;
+    const card=document.getElementById("card-"+id);
+    if(card){
+      card.classList.add("selected");
+      const inp=document.getElementById("qin-"+id);
+      if(inp) inp.value = p.unit==="kg" ? cart[id] : String(cart[id]);
+      refreshLine(p);
+    }
+  }
+  refreshTotals();
+}
+
+/* ---------- FORM / SUBMIT ---------- */
+function buildSummary(){
+  const box=document.getElementById("orderSummary");
+  box.innerHTML="";
+  let totalCents=0;
+  for(const id in cart){
+    const p=PRODUCTS[id]; const qty=cart[id];
+    if(!p) continue;
+    const subCents=lineCents(p.cents, qty);
+    totalCents+=subCents;
+    const unit = p.unit==="kg" ? T[LANG].unitKg : T[LANG].unitPza;
+    const row=document.createElement("div");
+    row.className="row";
+    row.innerHTML=`<span>${p.emoji} ${LANG==="es"?p.es:p.en} · ${qty} ${unit}</span><span>${money(subCents)}</span>`;
+    box.appendChild(row);
+  }
+  const tot=document.createElement("div");
+  tot.className="row tot";
+  tot.innerHTML=`<span>Total</span><span>${money(totalCents)}</span>`;
+  box.appendChild(tot);
+}
+
+function openForm(){
+  if(Object.keys(cart).length===0) return;
+  document.getElementById("formView").style.display="block";
+  document.getElementById("confirmationArea").style.display="none";
+  buildSummary();
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+
+function closeForm(){
+  document.getElementById("overlay").classList.remove("open");
+  document.body.style.overflow="";
+}
+
+function finishOrder(){
+  closeForm();
+  document.getElementById("formView").style.display="block";
+  document.getElementById("confirmationArea").style.display="none";
+}
+
+/* ---------- ORDER CODE & TIMESTAMPS ---------- */
+function genHex4(){
+  if(window.crypto && window.crypto.getRandomValues){
+    const arr = new Uint16Array(1);
+    window.crypto.getRandomValues(arr);
+    return arr[0].toString(16).padStart(4,"0").toUpperCase();
+  }
+  return Math.floor(Math.random() * 0x10000).toString(16).padStart(4,"0").toUpperCase();
+}
+
+function genOrderCode(now){
+  const d = now || new Date();
+  const pad = n => String(n).padStart(2,"0");
+  const y = d.getFullYear();
+  const m = pad(d.getMonth()+1);
+  const day = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const mm = pad(d.getMinutes());
+  return `FAL-${y}${m}${day}-${hh}${mm}-${genHex4()}`;
+}
+
+function formatIsoLocal(d){
+  const pad = n => String(n).padStart(2,"0");
+  const y = d.getFullYear();
+  const m = pad(d.getMonth()+1);
+  const day = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const mm = pad(d.getMinutes());
+  const ss = pad(d.getSeconds());
+  const offset = -d.getTimezoneOffset();
+  const sign = offset >= 0 ? "+" : "-";
+  const absOffset = Math.abs(offset);
+  const offH = pad(Math.floor(absOffset / 60));
+  const offM = pad(absOffset % 60);
+  return `${y}-${m}-${day}T${hh}:${mm}:${ss}${sign}${offH}:${offM}`;
+}
+
+function submitOrder(){
+  const name=document.getElementById("fName");
+  const phone=document.getElementById("fPhone");
+  const nameErr=document.getElementById("fNameErr");
+  const phoneErr=document.getElementById("fPhoneErr");
+
+  let ok=true;
+  if(!name.value.trim()){
+    name.classList.add("err");
+    nameErr.textContent = T[LANG].needName;
+    ok=false;
+  } else {
+    name.classList.remove("err");
+    nameErr.textContent = "";
+  }
+
+  if(!phone.value.trim()){
+    phone.classList.add("err");
+    phoneErr.textContent = T[LANG].needPhone;
+    ok=false;
+  } else {
+    phone.classList.remove("err");
+    phoneErr.textContent = "";
+  }
+
+  if(!ok) return;
+
+  const addr=document.getElementById("fAddr").value.trim();
+  const notes=document.getElementById("fNotes").value.trim();
+  const payRadio=document.querySelector('input[name="pay"]:checked');
+  const payVal = payRadio ? payRadio.value : "cash"; // "cash" | "card"
+  const payText = payVal==="cash" ? T[LANG].payCash : T[LANG].payCard;
+
+  const now = new Date();
+  const orderCode = genOrderCode(now);
+  const isoTs = formatIsoLocal(now);
+
+  const L = T[LANG];
+  let totalCents = 0;
+  const linesFormatted = [];
+  const machineLines = [];
+
+  for(const id in cart){
+    const p = PRODUCTS[id]; const qty = cart[id];
+    if(!p) continue;
+    const subCents = lineCents(p.cents, qty);
+    totalCents += subCents;
+    const unit = p.unit==="kg" ? L.unitKg : L.unitPza;
+    linesFormatted.push(`• ${p.emoji} ${LANG==="es"?p.es:p.en} — ${qty} ${unit} × ${money(p.cents)} = ${money(subCents)}`);
+    machineLines.push({
+      n: p.es,
+      u: p.unit,
+      qty: qty,
+      cents: p.cents
+    });
+  }
+
+  let msg = L.orderTitle + "\n\n";
+  msg += L.orderHdr + "\n" + linesFormatted.join("\n") + "\n\n";
+  msg += L.lblTotal + " " + money(totalCents) + "\n\n";
+  msg += L.custHdr + "\n";
+  msg += `${L.lblCustName}: ${name.value.trim()}\n`;
+  msg += `${L.lblCustPhone}: ${phone.value.trim()}\n`;
+  if(addr) msg += `${L.lblCustAddr}: ${addr}\n`;
+  if(notes) msg += `${L.lblCustNotes}: ${notes}\n`;
+  msg += `${L.lblCustPay}: ${payText}\n`;
+
+  const machinePayload = {
+    v: 1,
+    code: orderCode,
+    ts: isoTs,
+    cur: "MXN",
+    lines: machineLines,
+    total_cents: totalCents,
+    pay: payVal,
+    cust: {
+      name: name.value.trim(),
+      phone: phone.value.trim(),
+      addr: addr,
+      notes: notes
+    }
+  };
+
+  msg += "\n--PEDIDO--\n" + JSON.stringify(machinePayload);
+
+  const url = `https://wa.me/${SHOP_PHONE}?text=${encodeURIComponent(msg)}`;
+  window.open(url,"_blank");
+
+  // Clear cart on send
+  clearCart();
+
+  // Show order code in confirmation area
+  document.getElementById("confirmCode").textContent = orderCode;
+  document.getElementById("bannerCode").textContent = orderCode;
+  document.getElementById("confirmBanner").style.display = "block";
+  document.getElementById("formView").style.display = "none";
+  document.getElementById("confirmationArea").style.display = "block";
+}
+
+/* ---------- LANG ---------- */
+function toggleLang(){
+  LANG = LANG==="es" ? "en" : "es";
+  try{
+    localStorage.setItem("pedido_lang", LANG);
+  }catch(e){}
+  applyLang();
+}
+
+function applyLang(){
+  document.getElementById("langBtn").textContent = LANG==="es" ? "EN" : "ES";
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-es]").forEach(el=>{
+    el.textContent = LANG==="es" ? el.dataset.es : el.dataset.en;
+  });
+
+  const active = document.querySelector(".tab.active");
+  const activeIdx = active ? [...document.querySelectorAll(".tab")].indexOf(active) : 0;
+  buildTabs();
+  buildCatalog();
+  restoreCartUI();
+  const tabs = document.querySelectorAll(".tab");
+  tabs.forEach(t=>t.classList.remove("active"));
+  if(tabs[activeIdx]) tabs[activeIdx].classList.add("active");
+
+  const nameErr = document.getElementById("fNameErr");
+  if(nameErr && nameErr.textContent) nameErr.textContent = T[LANG].needName;
+  const phoneErr = document.getElementById("fPhoneErr");
+  if(phoneErr && phoneErr.textContent) phoneErr.textContent = T[LANG].needPhone;
+
+  if(document.getElementById("overlay").classList.contains("open")){
+    buildSummary();
+  }
+}
+
+/* ---------- SCROLL SPY ---------- */
+function initSpy(){
+  const opts={rootMargin:"-90px 0px -70% 0px", threshold:0};
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const id=e.target.id.replace("cat-","");
+        document.querySelectorAll(".tab").forEach(t=>{
+          t.classList.toggle("active", t.dataset.target==="cat-"+id);
+        });
+      }
+    });
+  },opts);
+  CATEGORIES.forEach(c=>{
+    const el=document.getElementById("cat-"+c.id);
+    if(el) io.observe(el);
+  });
+}
+
+/* ---------- INIT ---------- */
+async function loadCatalog(){
+  const res = await fetch("products.json?v=" + Date.now(), {cache:"no-store"});
+  if(!res.ok) throw new Error("HTTP " + res.status);
+  const data = await res.json();
+  PRODUCTS = data.products.filter(p => p.active !== false);
+  PRODUCTS.forEach((p,i)=>{
+    p._id = p.id !== undefined ? p.id : i;
+    p.cents = Math.round(p.price * 100);
+  });
+}
+
+function startApp(){
+  loadCartFromStorage();
+  applyLang();
+  initSpy();
+}
+
+loadCatalog().then(startApp).catch(err=>{
+  console.error("Catalog load failed:", err);
+  document.getElementById("catalog").innerHTML =
+    '<div style="text-align:center;padding:48px 20px;font-size:1.05rem;line-height:1.6;">' +
+    '⚠️ No se pudo cargar el catálogo.<br>Could not load the catalog.<br><br>' +
+    '<button onclick="location.reload()" type="button" style="min-height:48px;padding:12px 28px;font-size:1rem;border:none;border-radius:10px;background:#2e7d32;color:#fff;cursor:pointer;">Reintentar / Retry</button>' +
+    '</div>';
+});
+
+document.getElementById("overlay").addEventListener("click",(e)=>{
+  if(e.target.id==="overlay") closeForm();
+});
+
+const fNameInput = document.getElementById("fName");
+if(fNameInput){
+  fNameInput.addEventListener("input", ()=>{
+    if(fNameInput.value.trim()){
+      fNameInput.classList.remove("err");
+      const err = document.getElementById("fNameErr");
+      if(err) err.textContent = "";
+    }
+  });
+}
+
+const fPhoneInput = document.getElementById("fPhone");
+if(fPhoneInput){
+  fPhoneInput.addEventListener("input", ()=>{
+    if(fPhoneInput.value.trim()){
+      fPhoneInput.classList.remove("err");
+      const err = document.getElementById("fPhoneErr");
+      if(err) err.textContent = "";
+    }
+  });
+}
+</script>
+</body>
+</html>
