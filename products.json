@@ -3,6 +3,7 @@
   "updated": "2026-07-16",
   "products": [
     {
+      "id": "aguacate",
       "cat": "frutas",
       "es": "Aguacate",
       "en": "Avocado",
@@ -12,6 +13,7 @@
       "active": true
     },
     {
+      "id": "limon",
       "cat": "frutas",
       "es": "Limón",
       "en": "Lime",
@@ -21,6 +23,7 @@
       "active": true
     },
     {
+      "id": "manzana-roja",
       "cat": "frutas",
       "es": "Manzana Roja",
       "en": "Red Apple",
@@ -30,6 +33,7 @@
       "active": true
     },
     {
+      "id": "manzana-verde",
       "cat": "frutas",
       "es": "Manzana Verde",
       "en": "Green Apple",
@@ -39,6 +43,7 @@
       "active": true
     },
     {
+      "id": "naranja",
       "cat": "frutas",
       "es": "Naranja",
       "en": "Orange",
@@ -48,6 +53,7 @@
       "active": true
     },
     {
+      "id": "platano",
       "cat": "frutas",
       "es": "Plátano",
       "en": "Banana",
@@ -57,6 +63,7 @@
       "active": true
     },
     {
+      "id": "mango-ataulfo",
       "cat": "frutas",
       "es": "Mango Ataulfo",
       "en": "Ataulfo Mango",
@@ -66,6 +73,7 @@
       "active": true
     },
     {
+      "id": "papaya",
       "cat": "frutas",
       "es": "Papaya",
       "en": "Papaya",
@@ -75,6 +83,7 @@
       "active": true
     },
     {
+      "id": "pina",
       "cat": "frutas",
       "es": "Piña",
       "en": "Pineapple",
@@ -84,6 +93,7 @@
       "active": true
     },
     {
+      "id": "fresa",
       "cat": "frutas",
       "es": "Fresa",
       "en": "Strawberry",
@@ -93,6 +103,7 @@
       "active": true
     },
     {
+      "id": "uva-verde",
       "cat": "frutas",
       "es": "Uva Verde",
       "en": "Green Grape",
@@ -102,6 +113,7 @@
       "active": true
     },
     {
+      "id": "cebolla-blanca",
       "cat": "verduras",
       "es": "Cebolla Blanca",
       "en": "White Onion",
@@ -111,6 +123,7 @@
       "active": true
     },
     {
+      "id": "cilantro",
       "cat": "verduras",
       "es": "Cilantro",
       "en": "Cilantro",
@@ -120,6 +133,7 @@
       "active": true
     },
     {
+      "id": "jitomate",
       "cat": "verduras",
       "es": "Jitomate",
       "en": "Tomato",
@@ -129,6 +143,7 @@
       "active": true
     },
     {
+      "id": "lechuga",
       "cat": "verduras",
       "es": "Lechuga",
       "en": "Lettuce",
@@ -138,6 +153,7 @@
       "active": true
     },
     {
+      "id": "papa",
       "cat": "verduras",
       "es": "Papa",
       "en": "Potato",
@@ -147,6 +163,7 @@
       "active": true
     },
     {
+      "id": "zanahoria",
       "cat": "verduras",
       "es": "Zanahoria",
       "en": "Carrot",
@@ -156,6 +173,7 @@
       "active": true
     },
     {
+      "id": "chile-serrano",
       "cat": "verduras",
       "es": "Chile Serrano",
       "en": "Serrano Pepper",
@@ -165,6 +183,7 @@
       "active": true
     },
     {
+      "id": "chile-jalapeno",
       "cat": "verduras",
       "es": "Chile Jalapeño",
       "en": "Jalapeño",
@@ -174,6 +193,7 @@
       "active": true
     },
     {
+      "id": "cebolla-morada",
       "cat": "verduras",
       "es": "Cebolla Morada",
       "en": "Red Onion",
@@ -183,6 +203,7 @@
       "active": true
     },
     {
+      "id": "nopal",
       "cat": "verduras",
       "es": "Nopal",
       "en": "Cactus Paddle",
@@ -192,6 +213,7 @@
       "active": true
     },
     {
+      "id": "elote",
       "cat": "verduras",
       "es": "Elote",
       "en": "Corn Cob",
@@ -201,6 +223,7 @@
       "active": true
     },
     {
+      "id": "tomate-verde",
       "cat": "verduras",
       "es": "Tomate Verde",
       "en": "Tomatillo",
@@ -210,6 +233,7 @@
       "active": true
     },
     {
+      "id": "calabacita",
       "cat": "verduras",
       "es": "Calabacita",
       "en": "Zucchini",
@@ -219,6 +243,7 @@
       "active": true
     },
     {
+      "id": "pepino",
       "cat": "verduras",
       "es": "Pepino",
       "en": "Cucumber",
@@ -228,6 +253,7 @@
       "active": true
     },
     {
+      "id": "huevo-san-juan",
       "cat": "lacteos",
       "es": "Huevo San Juan",
       "en": "Eggs (San Juan)",
@@ -237,6 +263,7 @@
       "active": true
     },
     {
+      "id": "leche-lala-1l",
       "cat": "lacteos",
       "es": "Leche Lala 1L",
       "en": "Milk Lala 1L",
@@ -246,6 +273,7 @@
       "active": true
     },
     {
+      "id": "queso-fresco",
       "cat": "lacteos",
       "es": "Queso Fresco",
       "en": "Fresh Cheese",
@@ -255,6 +283,7 @@
       "active": true
     },
     {
+      "id": "yogurt-natural",
       "cat": "lacteos",
       "es": "Yogurt Natural",
       "en": "Plain Yogurt",
@@ -264,6 +293,7 @@
       "active": true
     },
     {
+      "id": "crema",
       "cat": "lacteos",
       "es": "Crema",
       "en": "Cream",
@@ -273,6 +303,7 @@
       "active": true
     },
     {
+      "id": "mantequilla",
       "cat": "lacteos",
       "es": "Mantequilla",
       "en": "Butter",
@@ -282,6 +313,7 @@
       "active": true
     },
     {
+      "id": "aceite",
       "cat": "abarrotes",
       "es": "Aceite",
       "en": "Cooking Oil",
@@ -291,6 +323,7 @@
       "active": true
     },
     {
+      "id": "arroz",
       "cat": "abarrotes",
       "es": "Arroz",
       "en": "Rice",
@@ -300,6 +333,7 @@
       "active": true
     },
     {
+      "id": "azucar",
       "cat": "abarrotes",
       "es": "Azúcar",
       "en": "Sugar",
@@ -309,6 +343,7 @@
       "active": true
     },
     {
+      "id": "frijol",
       "cat": "abarrotes",
       "es": "Frijol",
       "en": "Beans",
@@ -318,6 +353,7 @@
       "active": true
     },
     {
+      "id": "pan-bimbo",
       "cat": "abarrotes",
       "es": "Pan Bimbo",
       "en": "Bread (Bimbo)",
@@ -327,6 +363,7 @@
       "active": true
     },
     {
+      "id": "tortillas-de-harina",
       "cat": "abarrotes",
       "es": "Tortillas de Harina",
       "en": "Flour Tortillas",
@@ -336,6 +373,7 @@
       "active": true
     },
     {
+      "id": "salsa-valentina",
       "cat": "abarrotes",
       "es": "Salsa Valentina",
       "en": "Valentina Sauce",
@@ -345,6 +383,7 @@
       "active": true
     },
     {
+      "id": "atun",
       "cat": "abarrotes",
       "es": "Atún",
       "en": "Canned Tuna",
@@ -354,6 +393,7 @@
       "active": true
     },
     {
+      "id": "mayonesa",
       "cat": "abarrotes",
       "es": "Mayonesa",
       "en": "Mayonnaise",
@@ -363,6 +403,7 @@
       "active": true
     },
     {
+      "id": "agua-bonafont-1l",
       "cat": "bebidas",
       "es": "Agua Bonafont 1L",
       "en": "Bonafont Water 1L",
@@ -372,6 +413,7 @@
       "active": true
     },
     {
+      "id": "cerveza-modelo",
       "cat": "bebidas",
       "es": "Cerveza Modelo",
       "en": "Modelo Beer",
@@ -381,6 +423,7 @@
       "active": true
     },
     {
+      "id": "coca-cola-2l",
       "cat": "bebidas",
       "es": "Coca Cola 2L",
       "en": "Coca Cola 2L",
@@ -390,6 +433,7 @@
       "active": true
     },
     {
+      "id": "agua-de-coco",
       "cat": "bebidas",
       "es": "Agua de Coco",
       "en": "Coconut Water",
@@ -399,6 +443,7 @@
       "active": true
     },
     {
+      "id": "horchata-1l",
       "cat": "bebidas",
       "es": "Horchata 1L",
       "en": "Horchata 1L",
@@ -408,6 +453,7 @@
       "active": true
     },
     {
+      "id": "jamaica-1l",
       "cat": "bebidas",
       "es": "Jamaica 1L",
       "en": "Hibiscus 1L",
@@ -417,6 +463,7 @@
       "active": true
     },
     {
+      "id": "galletas-marias",
       "cat": "botanas",
       "es": "Galletas Marías",
       "en": "María Cookies",
@@ -426,6 +473,7 @@
       "active": true
     },
     {
+      "id": "sabritas",
       "cat": "botanas",
       "es": "Sabritas",
       "en": "Potato Chips",
@@ -435,6 +483,7 @@
       "active": true
     },
     {
+      "id": "chicharron",
       "cat": "botanas",
       "es": "Chicharrón",
       "en": "Pork Rinds",
@@ -444,6 +493,7 @@
       "active": true
     },
     {
+      "id": "cacahuate",
       "cat": "botanas",
       "es": "Cacahuate",
       "en": "Peanuts",

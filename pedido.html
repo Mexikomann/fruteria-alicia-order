@@ -178,7 +178,9 @@
     background:#fff;width:100%;max-width:520px;
     border-radius:20px 20px 0 0;
     padding:18px 18px calc(20px + env(safe-area-inset-bottom));
-    max-height:92vh;overflow-y:auto;
+    max-height:92vh;
+    max-height:92dvh;
+    overflow-y:auto;
     animation:slideUp .25s ease;
   }
   @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
@@ -205,7 +207,19 @@
     padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer;margin:0;
     min-height:48px;display:flex;align-items:center;justify-content:center;
   }
-  .pay input{display:none;}
+  .pay input{
+    position:absolute;
+    width:1px;height:1px;
+    padding:0;margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;opacity:0;
+  }
+  .pay label:focus-within{
+    outline:2px solid var(--green);
+    outline-offset:2px;
+  }
   .pay input:checked + span{color:var(--green);}
   .pay label:has(input:checked){border-color:var(--green);background:#f1f8e9;}
   #orderSummary{
@@ -270,10 +284,14 @@
 
 <main>
   <div id="confirmBanner" class="confirm-banner" style="display:none;" role="status">
-    <div class="banner-title">✅ <span data-es="¡Pedido enviado con éxito!" data-en="Order sent successfully!">¡Pedido enviado con éxito!</span></div>
+    <div class="banner-title"><span id="bannerTitleTxt" data-es="Abrimos WhatsApp. Toca Enviar para terminar tu pedido" data-en="WhatsApp is open — tap Send to finish your order">Abrimos WhatsApp. Toca <strong>Enviar</strong> para terminar tu pedido</span></div>
     <div class="banner-code"><span data-es="Código de pedido:" data-en="Order code:">Código de pedido:</span> <strong id="bannerCode"></strong></div>
   </div>
-  <div id="catalog"></div>
+  <div id="catalog">
+    <div id="catalogLoading" style="text-align:center;padding:48px 20px;font-size:1.1rem;color:var(--muted);font-weight:600;">
+      <span data-es="Cargando…" data-en="Loading…">Cargando…</span>
+    </div>
+  </div>
 </main>
 
 <footer data-es="Pedidos por WhatsApp · Mazatlán, Sinaloa" data-en="Orders via WhatsApp · Mazatlán, Sinaloa">Pedidos por WhatsApp · Mazatlán, Sinaloa</footer>
@@ -299,21 +317,21 @@
 
       <div class="field">
         <label><span data-es="Nombre" data-en="Name">Nombre</span> <span class="req">*</span></label>
-        <input type="text" id="fName" autocomplete="name" placeholder="...">
+        <input type="text" id="fName" autocomplete="name" data-ph-es="Ej. María López" data-ph-en="e.g. Mary Smith" placeholder="Ej. María López">
         <div class="field-err" id="fNameErr"></div>
       </div>
       <div class="field">
         <label><span data-es="Teléfono" data-en="Phone">Teléfono</span> <span class="req">*</span></label>
-        <input type="tel" id="fPhone" autocomplete="tel" inputmode="tel" placeholder="669...">
+        <input type="tel" id="fPhone" autocomplete="tel" inputmode="tel" data-ph-es="669 123 4567" data-ph-en="669 123 4567" placeholder="669 123 4567">
         <div class="field-err" id="fPhoneErr"></div>
       </div>
       <div class="field">
         <label data-es="Dirección" data-en="Address">Dirección</label>
-        <input type="text" id="fAddr" autocomplete="street-address" placeholder="...">
+        <input type="text" id="fAddr" autocomplete="street-address" data-ph-es="Calle y número, colonia" data-ph-en="Street and number, neighborhood" placeholder="Calle y número, colonia">
       </div>
       <div class="field">
         <label data-es="Notas" data-en="Notes">Notas</label>
-        <textarea id="fNotes" placeholder="..."></textarea>
+        <textarea id="fNotes" data-ph-es="Referencias de entrega, madurez de la fruta, etc." data-ph-en="Delivery references, fruit ripeness, etc." placeholder="Referencias de entrega, madurez de la fruta, etc."></textarea>
       </div>
       <div class="field">
         <label data-es="Método de pago" data-en="Payment method">Método de pago</label>
@@ -332,9 +350,22 @@
     </div>
 
     <div id="confirmationArea" style="display:none;text-align:center;padding:10px 4px 6px;">
-      <div style="font-size:48px;line-height:1;margin-bottom:12px;">✅</div>
-      <h2 data-es="¡Pedido enviado con éxito!" data-en="Order sent successfully!" style="margin:0 0 8px;font-size:22px;">¡Pedido enviado con éxito!</h2>
-      <p class="sub" data-es="Se abrió WhatsApp para enviar tu mensaje." data-en="WhatsApp opened to send your message." style="margin:0 0 16px;">Se abrió WhatsApp para enviar tu mensaje.</p>
+      <div id="confirmIcon" style="font-size:48px;line-height:1;margin-bottom:12px;">✅</div>
+      <h2 id="confirmTitle" style="margin:0 0 8px;font-size:20px;line-height:1.3;">Abrimos WhatsApp. Toca <strong>Enviar</strong> para terminar tu pedido</h2>
+      <p id="confirmSub" class="sub" style="margin:0 0 16px;">Se preparó tu pedido para enviarlo por WhatsApp.</p>
+
+      <div id="fallbackActionArea" style="display:none;margin:14px 0 16px;">
+        <a id="fallbackWaLink" href="#" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px;background:#25D366;color:#fff;border-radius:14px;text-decoration:none;font-size:16px;font-weight:800;margin-bottom:12px;padding:0 16px;box-shadow:var(--shadow);">
+          <span>📲</span><span id="fallbackLinkTxt">Abrir WhatsApp</span>
+        </a>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;text-align:left;font-weight:600;" id="fallbackCopyHint">
+          Mensaje del pedido:
+        </div>
+        <textarea id="fallbackMsgBox" readonly style="width:100%;height:100px;font-size:13px;border:2px solid var(--line);border-radius:10px;padding:8px;font-family:inherit;margin-bottom:8px;resize:vertical;"></textarea>
+        <button id="fallbackCopyBtn" onclick="copyFallbackMsg()" type="button" style="min-height:48px;width:100%;background:#f0e9db;color:var(--ink);border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <span>📋</span><span id="fallbackCopyBtnTxt">Copiar mensaje</span>
+        </button>
+      </div>
 
       <div class="code-box">
         <div class="code-lbl" data-es="Tu código de pedido" data-en="Your order code">Tu código de pedido</div>
@@ -366,6 +397,12 @@ const CATEGORIES = [
 ];
 
 let PRODUCTS = [];
+let PRODUCT_MAP = {};
+
+function getProduct(id){
+  if(id === undefined || id === null) return undefined;
+  return PRODUCT_MAP[id] || PRODUCTS[id] || PRODUCTS.find(p => p._id === String(id) || p.id === String(id));
+}
 
 /* ---------- STATE ---------- */
 let LANG = "es";
@@ -374,7 +411,10 @@ try {
   if(savedLang === "en" || savedLang === "es") LANG = savedLang;
 } catch(e){}
 
-const cart = {}; // key -> qty (number)
+let catalogLoaded = false;
+let catalogFailed = false;
+
+const cart = {}; // stable product id -> qty (number)
 
 const T = {
   es:{
@@ -395,7 +435,21 @@ const T = {
     lblCustPay: "Pago",
     lblTotal: "💰 *TOTAL:*",
     payCash: "Efectivo",
-    payCard: "Tarjeta"
+    payCard: "Tarjeta",
+    summaryTotal: "Total",
+    ariaDec: "Disminuir cantidad",
+    ariaInc: "Aumentar cantidad",
+    loading: "Cargando…",
+    catError: "⚠️ No se pudo cargar el catálogo.",
+    retry: "Reintentar",
+    waSuccessTitle: "Abrimos WhatsApp. Toca <strong>Enviar</strong> para terminar tu pedido",
+    waSuccessSub: "Se preparó tu pedido para enviarlo por WhatsApp.",
+    waFailTitle: "No pudimos abrir WhatsApp automáticamente",
+    waFailSub: "Toca el botón para abrir WhatsApp o copia el mensaje manualmente:",
+    waOpenBtn: "Abrir WhatsApp",
+    waMsgLbl: "Mensaje del pedido:",
+    copyMsg: "Copiar mensaje",
+    copiedMsg: "¡Mensaje copiado!"
   },
   en:{
     items: n => `${n} ${n===1?"item":"items"}`,
@@ -415,7 +469,21 @@ const T = {
     lblCustPay: "Payment",
     lblTotal: "💰 *TOTAL:*",
     payCash: "Cash",
-    payCard: "Card"
+    payCard: "Card",
+    summaryTotal: "Total",
+    ariaDec: "Decrease quantity",
+    ariaInc: "Increase quantity",
+    loading: "Loading…",
+    catError: "⚠️ Could not load the catalog.",
+    retry: "Retry",
+    waSuccessTitle: "WhatsApp is open — tap <strong>Send</strong> to finish your order",
+    waSuccessSub: "Your order is ready in WhatsApp. Tap send to finish.",
+    waFailTitle: "Could not open WhatsApp automatically",
+    waFailSub: "Tap the button to open WhatsApp or copy the message manually:",
+    waOpenBtn: "Open WhatsApp",
+    waMsgLbl: "Order message:",
+    copyMsg: "Copy message",
+    copiedMsg: "Message copied!"
   }
 };
 
@@ -430,24 +498,50 @@ const toHundredths = q => Math.round(q * 100);
 const lineCents = (unitCents, q) => Math.round(unitCents * toHundredths(q) / 100);
 
 /* ---------- LOCAL STORAGE HELPERS ---------- */
+const CART_STORAGE_KEY = "pedido_cart";
+const CART_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+
 function saveCart(){
   try{
-    localStorage.setItem("pedido_cart", JSON.stringify(cart));
+    const keys = Object.keys(cart);
+    if(keys.length === 0){
+      localStorage.removeItem(CART_STORAGE_KEY);
+      return;
+    }
+    const payload = {
+      ts: Date.now(),
+      items: { ...cart },
+      ...cart
+    };
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(payload));
   }catch(e){}
 }
 
 function loadCartFromStorage(){
   try{
-    const raw = localStorage.getItem("pedido_cart");
-    if(raw){
-      const parsed = JSON.parse(raw);
-      if(parsed && typeof parsed === "object"){
-        for(const k in parsed){
-          const q = Number(parsed[k]);
-          if(PRODUCTS[k] && !isNaN(q) && q > 0){
-            cart[k] = q;
-          }
-        }
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    if(!parsed || typeof parsed !== "object") return;
+
+    if(parsed.ts !== undefined){
+      const age = Date.now() - Number(parsed.ts);
+      if(isNaN(age) || age > CART_MAX_AGE_MS || age < -300000){
+        localStorage.removeItem(CART_STORAGE_KEY);
+        return;
+      }
+    }
+
+    const items = (parsed.items && typeof parsed.items === "object") ? parsed.items
+                : (parsed.cart && typeof parsed.cart === "object") ? parsed.cart
+                : parsed;
+
+    for(const k in items){
+      if(k === "ts" || k === "items" || k === "cart") continue;
+      const q = Number(items[k]);
+      const p = getProduct(k);
+      if(p && !isNaN(q) && q > 0){
+        cart[p._id] = p.unit === "pza" ? Math.floor(q) : Math.round(q * 100) / 100;
       }
     }
   }catch(e){}
@@ -456,7 +550,7 @@ function loadCartFromStorage(){
 function clearCart(){
   for(const k in cart) delete cart[k];
   try{
-    localStorage.removeItem("pedido_cart");
+    localStorage.removeItem(CART_STORAGE_KEY);
   }catch(e){}
   document.querySelectorAll(".card.selected").forEach(card=>{
     card.classList.remove("selected");
@@ -467,7 +561,13 @@ function clearCart(){
     const lt = card.querySelector('.line-total');
     if(lt) lt.textContent = "";
   });
+  hideConfirmBanner();
   refreshTotals();
+}
+
+function hideConfirmBanner(){
+  const banner = document.getElementById("confirmBanner");
+  if(banner) banner.style.display = "none";
 }
 
 /* ---------- RENDER ---------- */
@@ -519,8 +619,11 @@ function makeCard(p){
   const card = document.createElement("div");
   card.className = "card";
   card.id = "card-"+p._id;
+  card.setAttribute("role", "button");
+  card.setAttribute("tabindex", "0");
   const name = LANG==="es"?p.es:p.en;
   const unitLbl = p.unit==="kg" ? T[LANG].kg : T[LANG].pza;
+  card.setAttribute("aria-label", `${name}, ${money(p.cents)} ${unitLbl}`);
   card.innerHTML = `
     <div class="badge" id="badge-${p._id}"></div>
     <div class="emoji">${p.emoji}</div>
@@ -528,9 +631,9 @@ function makeCard(p){
     <div class="price">${money(p.cents)}</div>
     <div class="unit">${unitLbl}</div>
     <div class="qty">
-      <button class="qbtn" data-act="dec" type="button">−</button>
-      <input type="text" inputmode="decimal" id="qin-${p._id}" value="">
-      <button class="qbtn" data-act="inc" type="button">+</button>
+      <button class="qbtn" data-act="dec" type="button" aria-label="${T[LANG].ariaDec}: ${name}">−</button>
+      <input type="text" inputmode="decimal" id="qin-${p._id}" value="" aria-label="${name} ${p.unit==='kg'?T[LANG].unitKg:T[LANG].unitPza}">
+      <button class="qbtn" data-act="inc" type="button" aria-label="${T[LANG].ariaInc}: ${name}">+</button>
     </div>
     <div class="line-total" id="lt-${p._id}"></div>
   `;
@@ -538,6 +641,15 @@ function makeCard(p){
     if(e.target.closest(".qty")) return;
     if(cart[p._id]===undefined) setQty(p, defaultStep(p));
     else removeItem(p);
+  });
+  card.addEventListener("keydown",(e)=>{
+    if(e.key==="Enter" || e.key===" "){
+      if(e.target===card){
+        e.preventDefault();
+        if(cart[p._id]===undefined) setQty(p, defaultStep(p));
+        else removeItem(p);
+      }
+    }
   });
   card.querySelector('[data-act="inc"]').addEventListener("click",()=>step(p,+1));
   card.querySelector('[data-act="dec"]').addEventListener("click",()=>step(p,-1));
@@ -550,6 +662,7 @@ function makeCard(p){
 function defaultStep(p){ return p.unit==="kg" ? 0.5 : 1; }
 
 function step(p,dir){
+  hideConfirmBanner();
   const cur = cart[p._id] ?? 0;
   const inc = p.unit==="kg" ? 0.5 : 1;
   let next = Math.round((cur + dir*inc)*100)/100;
@@ -558,26 +671,33 @@ function step(p,dir){
 }
 
 function onType(p,input){
+  hideConfirmBanner();
   let raw = input.value.replace(",",".");
   if(p.unit==="pza") raw = raw.replace(/[^\d]/g,"");
   else raw = raw.replace(/[^\d.]/g,"");
   input.value = raw;
   const val = parseFloat(raw);
-  if(!isNaN(val) && val>0){
-    cart[p._id] = p.unit==="pza" ? Math.floor(val) : val;
-    saveCart();
-    refreshLine(p);
-    refreshTotals();
+  if(!isNaN(val)){
+    const rounded = p.unit==="pza" ? Math.floor(val) : Math.round(val*100)/100;
+    if(rounded>0){
+      cart[p._id] = rounded;
+      saveCart();
+      refreshLine(p);
+      refreshTotals();
+    }
   }
 }
 
 function normalize(p,input){
   const val = parseFloat(input.value.replace(",","."));
   if(isNaN(val) || val<=0){ removeItem(p); return; }
-  setQty(p, p.unit==="pza"?Math.floor(val):Math.round(val*100)/100);
+  const rounded = p.unit==="pza" ? Math.floor(val) : Math.round(val*100)/100;
+  if(rounded<=0){ removeItem(p); return; }
+  setQty(p, rounded);
 }
 
 function setQty(p,qty){
+  hideConfirmBanner();
   cart[p._id]=qty;
   saveCart();
   const card=document.getElementById("card-"+p._id);
@@ -618,7 +738,7 @@ function refreshLine(p){
 function refreshTotals(){
   let totalCents=0, count=0;
   for(const id in cart){
-    const p=PRODUCTS[id];
+    const p=getProduct(id);
     if(!p) continue;
     totalCents += lineCents(p.cents, cart[id]);
     count++;
@@ -631,7 +751,7 @@ function refreshTotals(){
 
 function restoreCartUI(){
   for(const id in cart){
-    const p=PRODUCTS[id];
+    const p=getProduct(id);
     if(!p) continue;
     const card=document.getElementById("card-"+id);
     if(card){
@@ -650,7 +770,7 @@ function buildSummary(){
   box.innerHTML="";
   let totalCents=0;
   for(const id in cart){
-    const p=PRODUCTS[id]; const qty=cart[id];
+    const p=getProduct(id); const qty=cart[id];
     if(!p) continue;
     const subCents=lineCents(p.cents, qty);
     totalCents+=subCents;
@@ -662,12 +782,13 @@ function buildSummary(){
   }
   const tot=document.createElement("div");
   tot.className="row tot";
-  tot.innerHTML=`<span>Total</span><span>${money(totalCents)}</span>`;
+  tot.innerHTML=`<span>${T[LANG].summaryTotal}</span><span>${money(totalCents)}</span>`;
   box.appendChild(tot);
 }
 
 function openForm(){
   if(Object.keys(cart).length===0) return;
+  hideConfirmBanner();
   document.getElementById("formView").style.display="block";
   document.getElementById("confirmationArea").style.display="none";
   buildSummary();
@@ -682,6 +803,8 @@ function closeForm(){
 
 function finishOrder(){
   closeForm();
+  clearCart();
+  hideConfirmBanner();
   document.getElementById("formView").style.display="block";
   document.getElementById("confirmationArea").style.display="none";
 }
@@ -766,7 +889,7 @@ function submitOrder(){
   const machineLines = [];
 
   for(const id in cart){
-    const p = PRODUCTS[id]; const qty = cart[id];
+    const p = getProduct(id); const qty = cart[id];
     if(!p) continue;
     const subCents = lineCents(p.cents, qty);
     totalCents += subCents;
@@ -809,20 +932,99 @@ function submitOrder(){
   msg += "\n--PEDIDO--\n" + JSON.stringify(machinePayload);
 
   const url = `https://wa.me/${SHOP_PHONE}?text=${encodeURIComponent(msg)}`;
-  window.open(url,"_blank");
 
-  // Clear cart on send
-  clearCart();
+  let win = null;
+  try {
+    win = window.open(url, "_blank");
+  } catch(e) {
+    win = null;
+  }
 
-  // Show order code in confirmation area
+  if(win){
+    clearCart();
+    showHandoffSuccess(orderCode);
+  } else {
+    try {
+      window.location.href = url;
+    } catch(e){}
+    showHandoffFallback(orderCode, url, msg);
+  }
+}
+
+function showHandoffSuccess(orderCode){
+  document.getElementById("confirmIcon").textContent = "✅";
+  const titleHtml = T[LANG].waSuccessTitle;
+  document.getElementById("confirmTitle").innerHTML = titleHtml;
+  document.getElementById("confirmSub").textContent = T[LANG].waSuccessSub;
+
+  document.getElementById("fallbackActionArea").style.display = "none";
   document.getElementById("confirmCode").textContent = orderCode;
-  document.getElementById("bannerCode").textContent = orderCode;
-  document.getElementById("confirmBanner").style.display = "block";
+
+  const banner = document.getElementById("confirmBanner");
+  if(banner){
+    document.getElementById("bannerTitleTxt").innerHTML = titleHtml;
+    document.getElementById("bannerCode").textContent = orderCode;
+    banner.style.display = "block";
+  }
+
   document.getElementById("formView").style.display = "none";
   document.getElementById("confirmationArea").style.display = "block";
 }
 
+function showHandoffFallback(orderCode, url, msg){
+  hideConfirmBanner();
+
+  document.getElementById("confirmIcon").textContent = "📲";
+  document.getElementById("confirmTitle").innerHTML = T[LANG].waFailTitle;
+  document.getElementById("confirmSub").textContent = T[LANG].waFailSub;
+
+  const fallbackArea = document.getElementById("fallbackActionArea");
+  fallbackArea.style.display = "block";
+
+  const link = document.getElementById("fallbackWaLink");
+  link.href = url;
+  document.getElementById("fallbackLinkTxt").textContent = T[LANG].waOpenBtn;
+
+  document.getElementById("fallbackCopyHint").textContent = T[LANG].waMsgLbl;
+  document.getElementById("fallbackMsgBox").value = msg;
+  document.getElementById("fallbackCopyBtnTxt").textContent = T[LANG].copyMsg;
+
+  document.getElementById("confirmCode").textContent = orderCode;
+  document.getElementById("formView").style.display = "none";
+  document.getElementById("confirmationArea").style.display = "block";
+}
+
+function copyFallbackMsg(){
+  const ta = document.getElementById("fallbackMsgBox");
+  if(ta){
+    ta.select();
+    ta.setSelectionRange(0, 99999);
+    try {
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(ta.value);
+      } else {
+        document.execCommand("copy");
+      }
+      document.getElementById("fallbackCopyBtnTxt").textContent = T[LANG].copiedMsg;
+    } catch(e){
+      document.execCommand("copy");
+      document.getElementById("fallbackCopyBtnTxt").textContent = T[LANG].copiedMsg;
+    }
+  }
+}
+
 /* ---------- LANG ---------- */
+function applyStaticText(){
+  document.getElementById("langBtn").textContent = LANG==="es" ? "EN" : "ES";
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-es]").forEach(el=>{
+    el.textContent = LANG==="es" ? el.dataset.es : el.dataset.en;
+  });
+  document.querySelectorAll("[data-ph-es]").forEach(el=>{
+    el.placeholder = LANG==="es" ? el.dataset.phEs : el.dataset.phEn;
+  });
+}
+
 function toggleLang(){
   LANG = LANG==="es" ? "en" : "es";
   try{
@@ -832,17 +1034,31 @@ function toggleLang(){
 }
 
 function applyLang(){
-  document.getElementById("langBtn").textContent = LANG==="es" ? "EN" : "ES";
-  document.documentElement.lang = LANG;
-  document.querySelectorAll("[data-es]").forEach(el=>{
-    el.textContent = LANG==="es" ? el.dataset.es : el.dataset.en;
-  });
+  applyStaticText();
+
+  if(catalogFailed){
+    renderCatalogError();
+    return;
+  }
+
+  if(!catalogLoaded){
+    const catalogEl = document.getElementById("catalog");
+    if(catalogEl){
+      catalogEl.innerHTML = `
+        <div style="text-align:center;padding:48px 20px;font-size:1.1rem;color:var(--muted);font-weight:600;">
+          ${T[LANG].loading}
+        </div>
+      `;
+    }
+    return;
+  }
 
   const active = document.querySelector(".tab.active");
   const activeIdx = active ? [...document.querySelectorAll(".tab")].indexOf(active) : 0;
   buildTabs();
   buildCatalog();
   restoreCartUI();
+  initSpy();
   const tabs = document.querySelectorAll(".tab");
   tabs.forEach(t=>t.classList.remove("active"));
   if(tabs[activeIdx]) tabs[activeIdx].classList.add("active");
@@ -855,12 +1071,29 @@ function applyLang(){
   if(document.getElementById("overlay").classList.contains("open")){
     buildSummary();
   }
+
+  if(document.getElementById("confirmationArea").style.display !== "none"){
+    const isFallback = document.getElementById("fallbackActionArea").style.display === "block";
+    const code = document.getElementById("confirmCode").textContent;
+    if(isFallback){
+      const url = document.getElementById("fallbackWaLink").href;
+      const msg = document.getElementById("fallbackMsgBox").value;
+      showHandoffFallback(code, url, msg);
+    } else {
+      showHandoffSuccess(code);
+    }
+  }
 }
 
 /* ---------- SCROLL SPY ---------- */
+let spyObserver = null;
+
 function initSpy(){
+  if(spyObserver){
+    spyObserver.disconnect();
+  }
   const opts={rootMargin:"-90px 0px -70% 0px", threshold:0};
-  const io=new IntersectionObserver(entries=>{
+  spyObserver = new IntersectionObserver(entries=>{
     entries.forEach(e=>{
       if(e.isIntersecting){
         const id=e.target.id.replace("cat-","");
@@ -872,35 +1105,77 @@ function initSpy(){
   },opts);
   CATEGORIES.forEach(c=>{
     const el=document.getElementById("cat-"+c.id);
-    if(el) io.observe(el);
+    if(el) spyObserver.observe(el);
   });
 }
 
-/* ---------- INIT ---------- */
+/* ---------- INIT & ERROR HANDLING ---------- */
+function renderCatalogError(){
+  document.getElementById("catalog").innerHTML = `
+    <div style="text-align:center;padding:48px 20px;font-size:1.05rem;line-height:1.6;">
+      <div>${T[LANG].catError}</div>
+      <br>
+      <button onclick="retryLoad()" type="button" style="min-height:48px;padding:12px 28px;font-size:1rem;border:none;border-radius:10px;background:#2e7d32;color:#fff;cursor:pointer;font-weight:700;">${T[LANG].retry}</button>
+    </div>
+  `;
+}
+
+async function retryLoad(){
+  catalogFailed = false;
+  catalogLoaded = false;
+  const catalogEl = document.getElementById("catalog");
+  if(catalogEl){
+    catalogEl.innerHTML = `
+      <div style="text-align:center;padding:48px 20px;font-size:1.1rem;color:var(--muted);font-weight:600;">
+        ${T[LANG].loading}
+      </div>
+    `;
+  }
+  try {
+    await loadCatalog();
+    catalogLoaded = true;
+    catalogFailed = false;
+    startApp();
+  } catch(err) {
+    catalogLoaded = false;
+    catalogFailed = true;
+    console.error("Catalog load failed:", err);
+    renderCatalogError();
+  }
+}
+
 async function loadCatalog(){
   const res = await fetch("products.json?v=" + Date.now(), {cache:"no-store"});
   if(!res.ok) throw new Error("HTTP " + res.status);
   const data = await res.json();
   PRODUCTS = data.products.filter(p => p.active !== false);
+  PRODUCT_MAP = {};
   PRODUCTS.forEach((p,i)=>{
-    p._id = p.id !== undefined ? p.id : i;
+    p._id = (p.id !== undefined && p.id !== null && p.id !== "") ? String(p.id) : ("item-" + i);
     p.cents = Math.round(p.price * 100);
+    PRODUCT_MAP[p._id] = p;
+    PRODUCTS[p._id] = p;
   });
 }
 
 function startApp(){
   loadCartFromStorage();
   applyLang();
-  initSpy();
 }
 
-loadCatalog().then(startApp).catch(err=>{
+// 1. Apply static text for saved language immediately BEFORE fetch starts
+applyStaticText();
+
+// 2. Fetch catalogue and initialize
+loadCatalog().then(()=>{
+  catalogLoaded = true;
+  catalogFailed = false;
+  startApp();
+}).catch(err=>{
+  catalogLoaded = false;
+  catalogFailed = true;
   console.error("Catalog load failed:", err);
-  document.getElementById("catalog").innerHTML =
-    '<div style="text-align:center;padding:48px 20px;font-size:1.05rem;line-height:1.6;">' +
-    '⚠️ No se pudo cargar el catálogo.<br>Could not load the catalog.<br><br>' +
-    '<button onclick="location.reload()" type="button" style="min-height:48px;padding:12px 28px;font-size:1rem;border:none;border-radius:10px;background:#2e7d32;color:#fff;cursor:pointer;">Reintentar / Retry</button>' +
-    '</div>';
+  renderCatalogError();
 });
 
 document.getElementById("overlay").addEventListener("click",(e)=>{
