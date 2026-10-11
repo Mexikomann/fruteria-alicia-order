@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2e7d32">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<title>Pedidos por surtir</title>
+<style>
+  /* Palette, radii and type feel reused from index.html (:root block is identical,
+     plus --red/--amber which the picker needs for the "no hay" / "cambiado" states). */
+  :root{
+    --green:#2e7d32;
+    --green-light:#66bb6a;
+    --yellow:#f9a825;
+    --orange:#f4511e;
+    --bg:#fffef7;
+    --card:#ffffff;
+    --ink:#33291f;
+    --muted:#7a6d5c;
+    --line:#eadfce;
+    --shadow:0 2px 10px rgba(120,90,30,.12);
+    --red:#c62828;
+    --red-bg:#fdecea;
+    --green-bg:#eef7ee;
+    --amber-bg:#fff6dc;
+    --amber-ink:#7a5200;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.4;
+    font-size:16px;
+    -webkit-text-size-adjust:100%;
+  }
+  body.lock{overflow:hidden;}
+  button{font-family:inherit;color:inherit;cursor:pointer;}
+  button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #1e88e5;outline-offset:2px;}
+  [hidden]{display:none!important;}
+
+  /* ---------- Language toggle (same corner pattern as index.html, but 48px tall) ---------- */
+  #langBtn{
+    position:fixed;top:10px;right:12px;z-index:60;
+    min-width:56px;min-height:48px;
+    background:rgba(255,255,255,.22);
+    border:1px solid rgba(255,255,255,.7);
+    color:#fff;border-radius:24px;
+    padding:0 14px;font-size:15px;font-weight:700;
+    text-shadow:0 1px 2px rgba(0,0,0,.25);
+  }
+  #langBtn:active{transform:scale(.95);}
+
+  /* ---------- Headers ---------- */
+  .hdr{
+    position:sticky;top:0;z-index:30;
+    background:linear-gradient(135deg,var(--green) 0%,var(--green-light) 60%,var(--yellow) 130%);
+    color:#fff;
+    padding:10px 14px 12px;
+    box-shadow:var(--shadow);
+  }
+  .hrow{display:flex;align-items:center;gap:10px;margin-right:68px;min-height:56px;}
+  .hdr h1{margin:0;font-size:24px;letter-spacing:.3px;line-height:1.2;}
+  .htitle{flex:1;min-width:0;}
+  .h-id{font-size:22px;font-weight:900;line-height:1.1;}
+  .h-name{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hbtn{
+    flex:0 0 auto;
+    min-width:48px;min-height:48px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.22);
+    border:1px solid rgba(255,255,255,.7);
+    color:#fff;border-radius:24px;
+    font-size:22px;font-weight:800;text-decoration:none;padding:0;
+  }
+  .hbtn:active{transform:scale(.95);}
+  .hmeta{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:15px;font-weight:600;}
+  .addr{
+    display:flex;align-items:flex-start;gap:8px;width:100%;
+    min-height:48px;margin-top:4px;padding:6px 10px;
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.45);
+    border-radius:12px;color:#fff;text-align:left;font-size:15px;line-height:1.35;
+  }
+  .addr .addr-body{flex:1;min-width:0;align-self:center;}
+  .addr .addr-text{
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+    overflow:hidden;
+  }
+  .addr[aria-expanded="true"] .addr-text{display:block;-webkit-line-clamp:unset;overflow:visible;}
+  .addr .dnotes{display:none;margin-top:4px;font-weight:700;}
+  .addr[aria-expanded="true"] .dnotes{display:block;}
+  .addr .chev{align-self:center;font-size:18px;transition:transform .15s;}
+  .addr[aria-expanded="true"] .chev{transform:rotate(180deg);}
+
+  /* ---------- Payment badge ---------- */
+  .pay{
+    display:inline-block;flex:0 0 auto;
+    padding:4px 12px;border-radius:14px;
+    font-size:14px;font-weight:800;white-space:nowrap;
+  }
+  .pay.cash{background:#fff3d0;color:var(--amber-ink);}
+  .pay.card{background:#e3f2fd;color:#0d47a1;}
+
+  main{padding:14px 12px 28px;max-width:640px;margin:0 auto;}
+  main.with-bar{padding-bottom:150px;}
+
+  /* ---------- Inbox ---------- */
+  .ocard{
+    display:flex;align-items:center;gap:12px;width:100%;
+    min-height:80px;margin-bottom:12px;padding:12px 14px;
+    background:var(--card);border:2px solid var(--line);border-radius:16px;
+    text-align:left;box-shadow:var(--shadow);
+  }
+  .ocard:active{transform:scale(.98);}
+  .oc-main{flex:1;min-width:0;}
+  .oc-title{font-size:19px;font-weight:800;overflow-wrap:anywhere;}
+  .oc-sub{font-size:15px;color:var(--muted);margin-top:2px;}
+  .ocard .chev{font-size:28px;color:var(--muted);}
+
+  .skel{
+    min-height:80px;margin-bottom:12px;border-radius:16px;border:2px solid var(--line);
+    background:linear-gradient(90deg,#f3ecde 25%,#fbf7ec 50%,#f3ecde 75%);
+    background-size:200% 100%;animation:shimmer 1.3s linear infinite;
+  }
+  .skel.tall{min-height:190px;}
+  @keyframes shimmer{from{background-position:200% 0;}to{background-position:-200% 0;}}
+
+  .msg{text-align:center;padding:40px 18px;}
+  .msg .big{font-size:48px;line-height:1;margin-bottom:12px;}
+  .msg p{font-size:20px;font-weight:700;margin:0 0 18px;}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    min-height:56px;padding:0 22px;border-radius:14px;
+    border:none;font-size:18px;font-weight:800;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--green);color:#fff;box-shadow:var(--shadow);
+  }
+  .btn:active:not(:disabled){transform:scale(.97);}
+  .btn.sec{background:#f0e9db;color:var(--ink);box-shadow:none;}
+  .btn.small{min-height:48px;font-size:16px;}
+  .btn.danger{background:var(--red);}
+  .btn:disabled{background:#d9d2c3;color:#5d5445;box-shadow:none;cursor:not-allowed;}
+
+  /* ---------- Item cards ---------- */
+  .item{
+    background:var(--card);border:2px solid var(--line);border-radius:16px;
+    padding:12px;margin-bottom:12px;min-height:96px;box-shadow:var(--shadow);
+  }
+  .item-top{display:flex;gap:12px;align-items:flex-start;}
+  .emo{position:relative;font-size:46px;line-height:1;flex:0 0 auto;width:58px;text-align:center;}
+  .emo .tick{
+    display:none;position:absolute;right:-2px;bottom:-4px;
+    width:26px;height:26px;border-radius:50%;
+    background:var(--green);color:#fff;font-size:17px;font-weight:900;line-height:26px;
+  }
+  .info{flex:1;min-width:0;}
+  .pname{font-size:20px;font-weight:800;overflow-wrap:anywhere;}
+  .req{font-size:16px;color:var(--muted);margin-top:1px;}
+  .lt{flex:0 0 auto;font-size:16px;font-weight:800;color:var(--muted);}
+  .chip{
+    display:inline-block;margin-top:8px;padding:5px 12px;border-radius:14px;
+    font-size:15px;font-weight:800;background:#f0e9db;color:#5d5445;overflow-wrap:anywhere;
+  }
+  .notebox{
+    margin-top:8px;padding:8px 10px;border-radius:10px;background:#f7f2e6;
+    font-size:15px;overflow-wrap:anywhere;
+  }
+  .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+  .act{
+    min-height:52px;border-radius:14px;
+    border:2px solid var(--line);background:#fff;
+    font-size:16px;font-weight:800;padding:0 6px;
+  }
+  .act:active{transform:scale(.97);}
+  .act.done{background:var(--green);border-color:var(--green);color:#fff;}
+  .act.no{color:var(--red);border-color:#e9b8b4;}
+  .act.on{box-shadow:0 0 0 3px rgba(51,41,31,.22);}
+
+  .item.st-listo{background:var(--green-bg);border-color:#a5d6a7;}
+  .item.st-listo .emo .tick{display:block;}
+  .item.st-listo .emo,.item.st-listo .pname,.item.st-listo .req,.item.st-listo .lt{opacity:.55;}
+  .item.st-listo .chip{background:var(--green);color:#fff;}
+  .item.st-cambiado{background:var(--amber-bg);border-color:var(--yellow);}
+  .item.st-cambiado .chip{background:#ffe08a;color:var(--amber-ink);}
+  .item.st-nohay{background:var(--red-bg);border-color:#e57373;}
+  .item.st-nohay .chip{background:var(--red);color:#fff;}
+  .item.st-nohay .lt{text-decoration:none;}
+
+  /* ---------- Bottom bar (order screen) ---------- */
+  #bottomBar{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:#fff;border-top:2px solid var(--line);
+    box-shadow:0 -4px 14px rgba(120,90,30,.14);
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+    min-height:64px;
+    display:flex;align-items:center;gap:12px;
+  }
+  #totalWrap{flex:0 1 auto;min-width:0;}
+  #totalWrap .amt{font-size:15px;font-weight:700;color:var(--muted);white-space:nowrap;}
+  #totalWrap .amt b{font-size:24px;font-weight:900;color:var(--green);}
+  #totalWrap .hint{font-size:13px;color:var(--muted);line-height:1.25;}
+  #doneBtn{flex:1;min-height:56px;font-size:17px;}
+
+  /* ---------- Dialogs ---------- */
+  .overlay{
+    position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;
+    background:rgba(40,30,15,.55);
+    display:flex;align-items:flex-end;justify-content:center;
+  }
+  .sheet{
+    background:#fff;width:100%;max-width:520px;
+    border-radius:20px 20px 0 0;
+    padding:18px 16px calc(18px + env(safe-area-inset-bottom));
+    max-height:92vh;overflow-y:auto;
+    animation:slideUp .22s ease;
+  }
+  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  .sheet h2{margin:0 0 4px;font-size:22px;line-height:1.25;overflow-wrap:anywhere;}
+  .sheet .sub{font-size:16px;color:var(--muted);margin:0 0 14px;}
+  .mact{display:flex;gap:10px;margin-top:14px;}
+  .mact .btn{flex:1;}
+  .mact .btn.sec{flex:0 0 38%;}
+  .field-err{color:var(--red);font-weight:700;font-size:15px;margin-top:8px;min-height:0;}
+  .field-err:empty{display:none;}
+  .txt{
+    width:100%;font-size:18px;font-family:inherit;
+    border:2px solid var(--line);border-radius:12px;padding:12px;background:#fff;color:var(--ink);
+    min-height:56px;
+  }
+  textarea.txt{min-height:110px;resize:vertical;}
+  .txt:focus{outline:none;border-color:var(--green-light);}
+  .txt.bad{border-color:var(--red);}
+  .opt{
+    display:flex;align-items:center;gap:12px;min-height:56px;
+    padding:8px 12px;margin-top:10px;border:2px solid var(--line);border-radius:12px;
+    font-size:18px;font-weight:700;cursor:pointer;
+  }
+  .opt input{width:26px;height:26px;margin:0;accent-color:var(--green);flex:0 0 auto;}
+  .opt.sel{border-color:var(--green);background:var(--green-bg);}
+  .subwrap{margin-top:8px;}
+  .stepper{display:flex;align-items:center;gap:10px;margin:8px 0 4px;}
+  .stepper .sbtn{
+    flex:0 0 68px;height:68px;border-radius:16px;border:none;
+    background:var(--green);color:#fff;font-size:34px;font-weight:900;line-height:1;
+  }
+  .stepper .sbtn:active{transform:scale(.94);}
+  .stepper .qwrap{flex:1;min-width:0;display:flex;align-items:center;gap:8px;}
+  .stepper .qwrap .txt{text-align:center;font-size:26px;font-weight:900;min-height:68px;padding:8px 4px;}
+  .stepper .unit{font-size:20px;font-weight:800;}
+  .sumrow{padding:10px 0;border-bottom:1px dashed var(--line);font-size:17px;overflow-wrap:anywhere;}
+  .sumrow:last-child{border-bottom:none;}
+  .sumrow .sn{font-size:15px;color:var(--muted);margin-top:2px;}
+  .sumbox{background:#fbf7ec;border:1px solid var(--line);border-radius:12px;padding:4px 12px;margin-bottom:12px;max-height:38vh;overflow-y:auto;}
+  .sumtot{display:flex;justify-content:space-between;align-items:baseline;font-size:20px;font-weight:900;margin:8px 0;}
+  .sumtot b{font-size:28px;color:var(--green);}
+  .lbl{display:block;font-size:16px;font-weight:700;margin:12px 0 6px;}
+
+  /* ---------- Success ---------- */
+  .success{
+    min-height:100vh;
+    background:linear-gradient(135deg,var(--green) 0%,var(--green-light) 100%);
+    color:#fff;text-align:center;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:80px 24px 40px;
+  }
+  .success h1{font-size:30px;line-height:1.25;margin:0 0 14px;max-width:420px;overflow-wrap:anywhere;}
+  .success .sl{font-size:18px;opacity:.95;}
+  .success .st{font-size:46px;font-weight:900;margin:2px 0 32px;}
+  .success .btn{background:#fff;color:var(--green);min-width:240px;max-width:100%;}
+
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+
+  @media (prefers-reduced-motion:reduce){
+    .skel{animation:none;}
+    .sheet{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<button id="langBtn" type="button">EN</button>
+<div id="app"></div>
+<div id="bottomBar" hidden>
+  <div id="totalWrap">
+    <div class="amt" id="totalAmt"></div>
+    <div class="hint" id="totalHint"></div>
+  </div>
+  <button id="doneBtn" class="btn" type="button" disabled></button>
+</div>
+<div id="modalRoot"></div>
+
+<script>
+/* =====================================================================
+   picker.html — Picker app (employee packing screen)
+   Self-contained: no network requests, no libraries, no fonts.
+
+   DEV HELPER (verification only):
+     ?state=loading|error|empty|success   forces a state
+        loading : skeletons stay forever
+        error   : first load fails once; "Reintentar" then succeeds
+        empty   : inbox is empty once; refresh then shows mock orders
+        success : jumps to the success screen (uses ?order=<id> or first mock)
+     ?order=<id>   opens a specific mock order (1042, 1043, 1044)
+
+   HERMES: the ONLY things to touch are the three stub functions in the
+   "DATA CONTRACT" section and the USE_MOCK flag right above them.
+   ===================================================================== */
+
+/* ---------- Strings: all UI text lives here ---------- */
+const T = {
+  es:{
+    inboxTitle:"Pedidos por surtir",
+    items:n=> n===1 ? "1 artículo" : n+" artículos",
+    ago:m=> m<1 ? "ahora mismo" : m<60 ? "hace "+m+" min" : m<1440 ? "hace "+Math.floor(m/60)+" h" : "hace "+Math.floor(m/1440)+" d",
+    cash:"Efectivo", card:"Tarjeta",
+    emptyTitle:"No hay pedidos pendientes", refresh:"Actualizar",
+    loadErr:"No se pudieron cargar los pedidos", retry:"Reintentar",
+    orderErr:"No se pudo cargar el pedido", orderWord:"Pedido",
+    backToOrders:"Volver a pedidos", loading:"Cargando…",
+    call:name=>"Llamar a "+name, tapToExpand:"Tocar para ver la dirección completa",
+    requested:"Pedido", pending:"Pendiente",
+    btnDone:"✓ Listo", btnChange:"⚖ Cambiar", btnNo:"✗ No hay", btnNote:"💬 Nota",
+    stDone:"✓ Listo",
+    stChanged:(q,u)=>"⚖ Cambiado: "+q+" "+u,
+    stNo:"✗ No hay", stNoSub:s=>"✗ No hay · Reemplazo: "+s, stNoRemove:"✗ No hay · quitar",
+    unitKg:"kg", unitPza:"pza",
+    total:"Total:",
+    missing:n=> n===1 ? "Falta 1 artículo por marcar" : "Faltan "+n+" artículos por marcar",
+    allSet:"✓ Todo marcado",
+    finish:"Listo para facturar",
+    changeTitle:"Cambiar cantidad", changeAsked:(q,u)=>"Pedido: "+q+" "+u,
+    less:"Disminuir", more:"Aumentar", qtyLabel:"Cantidad",
+    errKg:"Escribe un peso válido en kilos (de 0.05 en 0.05, por ejemplo 1.35).",
+    errPza:"Escribe un número entero de piezas, mayor a 0.",
+    save:"Guardar", cancel:"Cancelar",
+    nohayTitle:"No hay este producto", replaceBy:"Reemplazar por…", replacePh:"Ej. Espinaca",
+    removeOpt:"Quitar del pedido", errSub:"Escribe por cuál producto lo reemplazas.",
+    noteTitle:"Nota", notePh:"Ej. está muy maduro",
+    summaryTitle:"Resumen del pedido", nothingAdj:"Todo se surtió tal como se pidió.",
+    sumChanged:(a,b,u)=>"⚖ "+a+" "+u+" → "+b+" "+u,
+    sumNoSub:s=>"✗ No hay · Reemplazo: "+s, sumNoRemove:"✗ No hay · quitar del pedido",
+    finalTotal:"Total final", empNotes:"Notas para facturación (opcional)",
+    confirm:"Confirmar", goBack:"Regresar", saving:"Guardando…",
+    saveErr:"No se pudo guardar. Revisa tu conexión e intenta de nuevo.",
+    leaveTitle:"¿Salir del pedido?", leaveMsg:"Se perderá lo que ya marcaste.",
+    leave:"Salir", stay:"Quedarse",
+    successTitle:id=>"✓ Pedido #"+id+" listo para facturar",
+    langAria:"Cambiar idioma a inglés", title:"Pedidos por surtir"
+  },
+  en:{
+    inboxTitle:"Orders to pack",
+    items:n=> n===1 ? "1 item" : n+" items",
+    ago:m=> m<1 ? "just now" : m<60 ? m+" min ago" : m<1440 ? Math.floor(m/60)+" h ago" : Math.floor(m/1440)+" d ago",
+    cash:"Cash", card:"Card",
+    emptyTitle:"No pending orders", refresh:"Refresh",
+    loadErr:"Could not load the orders", retry:"Retry",
+    orderErr:"Could not load the order", orderWord:"Order",
+    backToOrders:"Back to orders", loading:"Loading…",
+    call:name=>"Call "+name, tapToExpand:"Tap to see the full address",
+    requested:"Ordered", pending:"Pending",
+    btnDone:"✓ Done", btnChange:"⚖ Change", btnNo:"✗ Out of stock", btnNote:"💬 Note",
+    stDone:"✓ Done",
+    stChanged:(q,u)=>"⚖ Changed: "+q+" "+u,
+    stNo:"✗ Out of stock", stNoSub:s=>"✗ Out of stock · Replace with: "+s, stNoRemove:"✗ Out of stock · remove",
+    unitKg:"kg", unitPza:"pc",
+    total:"Total:",
+    missing:n=> n===1 ? "1 item left to mark" : n+" items left to mark",
+    allSet:"✓ All marked",
+    finish:"Ready to invoice",
+    changeTitle:"Change quantity", changeAsked:(q,u)=>"Ordered: "+q+" "+u,
+    less:"Decrease", more:"Increase", qtyLabel:"Quantity",
+    errKg:"Enter a valid weight in kilos (steps of 0.05, e.g. 1.35).",
+    errPza:"Enter a whole number of pieces, greater than 0.",
+    save:"Save", cancel:"Cancel",
+    nohayTitle:"Out of stock", replaceBy:"Replace with…", replacePh:"E.g. Spinach",
+    removeOpt:"Remove from order", errSub:"Type the product you are replacing it with.",
+    noteTitle:"Note", notePh:"E.g. very ripe",
+    summaryTitle:"Order summary", nothingAdj:"Everything was packed as ordered.",
+    sumChanged:(a,b,u)=>"⚖ "+a+" "+u+" → "+b+" "+u,
+    sumNoSub:s=>"✗ Out of stock · Replace with: "+s, sumNoRemove:"✗ Out of stock · remove from order",
+    finalTotal:"Final total", empNotes:"Notes for invoicing (optional)",
+    confirm:"Confirm", goBack:"Go back", saving:"Saving…",
+    saveErr:"Could not save. Check your connection and try again.",
+    leaveTitle:"Leave this order?", leaveMsg:"What you already marked will be lost.",
+    leave:"Leave", stay:"Stay",
+    successTitle:id=>"✓ Order #"+id+" ready to invoice",
+    langAria:"Switch language to Spanish", title:"Orders to pack"
+  }
+};
+let LANG = "es";
+const t = (k,...a)=>{ const v = T[LANG][k]; return typeof v==="function" ? v(...a) : v; };
+
+/* ---------- Small helpers ---------- */
+const $ = (s,r)=> (r||document).querySelector(s);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+/* Money is ALWAYS integer cents. Quantities are handled as integer hundredths
+   (1.35 kg -> 135) so no float arithmetic ever touches pesos. */
+function money(cents){
+  const c = Math.round(cents), neg = c<0, a = Math.abs(c);
+  const pesos = String(Math.floor(a/100)).replace(/\B(?=(\d{3})+(?!\d))/g,",");
+  return (neg?"-":"")+"$"+pesos+"."+String(a%100).padStart(2,"0");
+}
+const toU = q => Math.round(q*100);                          // quantity -> hundredths
+const lineCents = (priceCents,q) => Math.round(priceCents*toU(q)/100);
+const fmtQty = q => String(Math.round(q*100)/100);          // 1.35 -> "1.35", 2 -> "2"
+const unitLabel = u => u==="kg" ? t("unitKg") : t("unitPza");
+
+function parseTs(s){
+  const m = /^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)(?::(\d\d))?/.exec(String(s||""));
+  return m ? new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0)).getTime() : NaN;
+}
+function ageText(created){
+  const ts = parseTs(created);
+  if(isNaN(ts)) return "";
+  return t("ago", Math.max(0, Math.floor((Date.now()-ts)/60000)));
+}
+function payBadge(method){
+  const cash = method==="cash", card = method==="card";
+  return '<span class="pay '+(cash?"cash":card?"card":"")+'">'+esc(cash?t("cash"):card?t("card"):method)+'</span>';
+}
+
+/* =====================================================================
+   MOCK DATA — three realistic orders, vocabulary from products.json
+   ===================================================================== */
+function stamp(minAgo){
+  const d = new Date(Date.now()-minAgo*60000), p = n=>String(n).padStart(2,"0");
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds());
+}
+const MOCK_ORDERS = [
+  { /* has a kg line weighing 1.35 */
+    id:1042, created_at:stamp(12), status:"CONFIRMED", payment_method:"cash",
+    customer:{ name:"María García", phone:"6691234567", address:"Calle Hidalgo #123, Col. Centro, atrás del Oxxo" },
+    delivery_notes:"portón azul",
+    lines:[
+      { id:11, product_name:"Manzana Roja",   emoji:"🍎", unit:"kg",  price_cents:4500,  quantity:2,    picked:0 },
+      { id:12, product_name:"Lechuga",        emoji:"🥬", unit:"pza", price_cents:1800,  quantity:1,    picked:0 },
+      { id:13, product_name:"Jitomate",       emoji:"🍅", unit:"kg",  price_cents:3800,  quantity:1.35, picked:0 },
+      { id:14, product_name:"Leche Lala 1L",  emoji:"🥛", unit:"pza", price_cents:2800,  quantity:2,    picked:0 },
+      { id:15, product_name:"Queso Fresco",   emoji:"🧀", unit:"kg",  price_cents:12000, quantity:0.5,  picked:0 },
+      { id:16, product_name:"Huevo San Juan", emoji:"🥚", unit:"pza", price_cents:6200,  quantity:1,    picked:0 }
+    ]
+  },
+  { /* has an item already missing (picked:-1) */
+    id:1043, created_at:stamp(34), status:"CONFIRMED", payment_method:"card",
+    customer:{ name:"Rosa Elena Beltrán", phone:"6699876543", address:"Av. Camarón Sábalo #410, Fracc. Sábalo Country, casa blanca con reja negra, entre Calle Mero y Calle Robalo" },
+    delivery_notes:"tocar el timbre dos veces",
+    lines:[
+      { id:21, product_name:"Aguacate",           emoji:"🥑", unit:"kg",  price_cents:6500, quantity:1,   picked:0 },
+      { id:22, product_name:"Limón",              emoji:"🍋", unit:"kg",  price_cents:3500, quantity:0.5, picked:0 },
+      { id:23, product_name:"Cilantro",           emoji:"🌿", unit:"pza", price_cents:1000, quantity:2,   picked:0 },
+      { id:24, product_name:"Piña",               emoji:"🍍", unit:"kg",  price_cents:3000, quantity:1.5, picked:-1 },
+      { id:25, product_name:"Tortillas de Harina",emoji:"🫓", unit:"pza", price_cents:2200, quantity:2,   picked:0 }
+    ]
+  },
+  { /* clean */
+    id:1044, created_at:stamp(5), status:"CONFIRMED", payment_method:"cash",
+    customer:{ name:"Juan Pablo Osuna", phone:"6692468013", address:"Calle Aquiles Serdán #88, Col. Juárez" },
+    delivery_notes:"",
+    lines:[
+      { id:31, product_name:"Plátano",          emoji:"🍌", unit:"kg",  price_cents:2200, quantity:1,   picked:0 },
+      { id:32, product_name:"Cebolla Blanca",   emoji:"🧅", unit:"kg",  price_cents:2500, quantity:0.5, picked:0 },
+      { id:33, product_name:"Sabritas",         emoji:"🥔", unit:"pza", price_cents:2300, quantity:3,   picked:0 },
+      { id:34, product_name:"Agua Bonafont 1L", emoji:"💧", unit:"pza", price_cents:1500, quantity:6,   picked:0 }
+    ]
+  }
+];
+const MOCK_DONE = {};   // ids "submitted" in this session, so they leave the inbox
+const clone = o => JSON.parse(JSON.stringify(o));
+async function mockLoadPending(){
+  await sleep(350);
+  return MOCK_ORDERS.filter(o=>!MOCK_DONE[o.id]).map(o=>({
+    id:o.id, created_at:o.created_at, payment_method:o.payment_method,
+    customer_name:o.customer.name, item_count:o.lines.length
+  }));
+}
+async function mockLoadOrder(orderId){
+  await sleep(350);
+  const o = MOCK_ORDERS.find(x=>String(x.id)===String(orderId));
+  if(!o) throw new Error("order not found");
+  return clone(o);
+}
+async function mockSubmit(orderId,result){
+  await sleep(500);
+  MOCK_DONE[orderId] = result;
+  return {ok:true};
+}
+
+/* =====================================================================
+   DATA CONTRACT — stubs. Hermes wires these later. Leave them named
+   exactly like this; the UI only talks to the network through them.
+   ===================================================================== */
+const USE_MOCK = true;   // HERMES: set to false once the three stubs below are wired.
+
+/** Return the pending orders as an array of OrderSummary:
+ *  { id, created_at:"YYYY-MM-DD HH:MM:SS", payment_method:"cash"|"card",
+ *    customer_name:string, item_count:number }
+ *  Throw (reject) on failure — the UI shows the error state with "Reintentar". */
+async function loadPendingOrders() {}
+
+/** Return one full Order (see picker-spec.md "Order" shape) for orderId.
+ *  Throw (reject) on failure or if the order does not exist. */
+async function loadOrder(orderId) {}
+
+/** Save the picker's result for orderId. `result` is
+ *  { total_cents, lines:[{id, picked:1, quantity, note?} | {id, picked:-1, substitution, note}], employee_notes }
+ *  (substitution === "" means "quitar del pedido"). Resolve {ok:true}; throw or
+ *  resolve anything else on failure — the UI keeps the work and offers retry. */
+async function submitPicked(orderId, result) {}
+
+/* Thin adapters between UI and data layer (dev-state forcing + mock switch). */
+let forced = null;   // dev helper state from ?state=
+async function fetchPending(){
+  if(forced==="error"){ forced=null; await sleep(300); throw new Error("forced"); }
+  if(forced==="empty"){ forced=null; await sleep(300); return []; }
+  const r = USE_MOCK ? await mockLoadPending() : await loadPendingOrders();
+  if(!Array.isArray(r)) throw new Error("bad pending list");
+  return r.slice().sort((a,b)=> String(a.created_at).localeCompare(String(b.created_at)));
+}
+async function fetchOrder(id){
+  if(forced==="error"){ forced=null; await sleep(300); throw new Error("forced"); }
+  const o = USE_MOCK ? await mockLoadOrder(id) : await loadOrder(id);
+  if(!o || !Array.isArray(o.lines)) throw new Error("bad order");
+  return o;
+}
+async function sendPicked(id,result){
+  const r = USE_MOCK ? await mockSubmit(id,result) : await submitPicked(id,result);
+  if(!r || r.ok!==true) throw new Error("submit failed");
+  return r;
+}
+
+/* =====================================================================
+   APP STATE
+   ===================================================================== */
+const app = $("#app");
+let nav = 0;                 // navigation token: ignore stale async results
+let redraw = function(){};   // re-renders the current screen (used by language toggle)
+let view = null;             // order screen: {order, st:{lineId:{st,qty,sub,note}}, dirty}
+let currentOrderId = null;
+
+/* Line state: st = "pending" | "listo" | "cambiado" | "nohay" */
+function initLine(l){
+  if(l.picked===1)  return {st:"listo", qty:l.quantity, sub:"", note:l.note||""};
+  if(l.picked===-1) return {st:"nohay", qty:l.quantity, sub:l.substitution||"", note:l.note||""};
+  return {st:"pending", qty:l.quantity, sub:"", note:l.note||""};
+}
+function lineCentsNow(l,s){
+  if(s.st==="nohay") return 0;                         // substitution has no price in the contract
+  if(s.st==="cambiado") return lineCents(l.price_cents,s.qty);
+  return lineCents(l.price_cents,l.quantity);          // pending = estimate at requested qty; listo = requested
+}
+function totalCents(){ return view.order.lines.reduce((sum,l)=>sum+lineCentsNow(l,view.st[l.id]),0); }
+function missingCount(){ return view.order.lines.filter(l=>view.st[l.id].st==="pending").length; }
+const lineById = id => view.order.lines.find(l=>String(l.id)===String(id));
+
+/* ---------- Dialog infrastructure (no alert/confirm/prompt anywhere) ---------- */
+let modalEl = null, modalCancel = null, lastFocus = null;
+function openModal(html, handlers, onCancel){
+  closeModal(true);
+  lastFocus = document.activeElement;
+  const ov = document.createElement("div");
+  ov.className = "overlay";
+  ov.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">'+html+'</div>';
+  $("#modalRoot").appendChild(ov);
+  document.body.classList.add("lock");
+  modalEl = ov; modalCancel = onCancel || closeModal;
+  const sheet = ov.firstChild;
+  sheet.addEventListener("click",e=>{
+    const b = e.target.closest("[data-m]");
+    if(b && !b.disabled && handlers[b.dataset.m]) handlers[b.dataset.m](b);
+  });
+  return sheet;
+}
+function closeModal(silent){
+  if(!modalEl) return;
+  modalEl.remove(); modalEl = null; modalCancel = null;
+  document.body.classList.remove("lock");
+  if(!silent && lastFocus && lastFocus.focus){ try{ lastFocus.focus({preventScroll:true}); }catch(e){} }
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && modalEl && modalCancel) modalCancel();
+});
+
+/* =====================================================================
+   SCREEN A — Inbox
+   ===================================================================== */
+function inboxHeader(){
+  return '<header class="hdr"><div class="hrow"><div class="htitle"><h1>'+esc(t("inboxTitle"))+'</h1></div></div></header>';
+}
+async function showInbox(){
+  const tok = ++nav;
+  closeModal(true);
+  currentOrderId = null; view = null;
+  $("#bottomBar").hidden = true;
+  window.scrollTo(0,0);
+  let list = null, status = "loading";
+  const draw = ()=>{
+    let body;
+    if(status==="loading"){
+      body = '<div aria-busy="true"><span class="sr" role="status">'+esc(t("loading"))+'</span><div class="skel"></div><div class="skel"></div></div>';
+    } else if(status==="error"){
+      body = '<div class="msg"><div class="big">⚠️</div><p>'+esc(t("loadErr"))+'</p><button class="btn" data-act="retry-inbox" type="button">'+esc(t("retry"))+'</button></div>';
+    } else if(!list.length){
+      body = '<div class="msg"><div class="big">🧺</div><p>'+esc(t("emptyTitle"))+'</p><button class="btn small sec" data-act="refresh" type="button">↻ '+esc(t("refresh"))+'</button></div>';
+    } else {
+      body = list.map(o=>
+        '<button class="ocard" type="button" data-act="open-order" data-order="'+esc(o.id)+'">'+
+          '<div class="oc-main"><div class="oc-title">#'+esc(o.id)+' · '+esc(o.customer_name)+'</div>'+
+          '<div class="oc-sub">'+esc(t("items",o.item_count))+' · '+esc(ageText(o.created_at))+'</div></div>'+
+          payBadge(o.payment_method)+'<span class="chev" aria-hidden="true">›</span></button>'
+      ).join("");
+    }
+    app.innerHTML = inboxHeader()+'<main>'+body+'</main>';
+  };
+  redraw = draw;
+  draw();
+  if(forced==="loading") return;      // dev helper: skeletons stay
+  try{ list = await fetchPending(); status = "ok"; }
+  catch(e){ status = "error"; }
+  if(tok!==nav) return;
+  draw();
+}
+
+/* =====================================================================
+   SCREEN B — Packing an order
+   ===================================================================== */
+function simpleHeader(title,withBack){
+  return '<header class="hdr"><div class="hrow">'+
+    (withBack?'<button class="hbtn" type="button" data-act="to-inbox" aria-label="'+esc(t("backToOrders"))+'">←</button>':'')+
+    '<div class="htitle"><h1>'+esc(title)+'</h1></div></div></header>';
+}
+async function showOrder(orderId){
+  const tok = ++nav;
+  closeModal(true);
+  currentOrderId = orderId; view = null;
+  $("#bottomBar").hidden = true;
+  window.scrollTo(0,0);
+  let status = "loading";
+  const draw = ()=>{
+    if(status==="ok"){ renderOrder(); return; }
+    $("#bottomBar").hidden = true;
+    let body;
+    if(status==="loading"){
+      body = '<div aria-busy="true"><span class="sr" role="status">'+esc(t("loading"))+'</span><div class="skel"></div><div class="skel tall"></div><div class="skel tall"></div></div>';
+    } else {
+      body = '<div class="msg"><div class="big">⚠️</div><p>'+esc(t("orderErr"))+'</p>'+
+        '<button class="btn" data-act="retry-order" type="button">'+esc(t("retry"))+'</button>'+
+        '<div style="height:12px"></div>'+
+        '<button class="btn small sec" data-act="to-inbox" type="button">'+esc(t("backToOrders"))+'</button></div>';
+    }
+    app.innerHTML = simpleHeader(t("orderWord")+" #"+orderId,true)+'<main>'+body+'</main>';
+  };
+  redraw = draw;
+  draw();
+  if(forced==="loading") return;
+  try{
+    const order = await fetchOrder(orderId);
+    if(tok!==nav) return;
+    const st = {};
+    order.lines.forEach(l=>{ st[l.id] = initLine(l); });
+    view = {order, st, dirty:false};
+    status = "ok";
+  }catch(e){
+    if(tok!==nav) return;
+    status = "error";
+  }
+  draw();
+}
+
+function itemHTML(l){
+  const s = view.st[l.id], u = unitLabel(l.unit);
+  let chip;
+  if(s.st==="listo") chip = t("stDone");
+  else if(s.st==="cambiado") chip = t("stChanged",fmtQty(s.qty),u);
+  else if(s.st==="nohay") chip = s.sub ? t("stNoSub",s.sub) : t("stNoRemove");
+  else chip = t("pending");
+  const price = s.st==="nohay" ? "—" : money(lineCentsNow(l,s));
+  return '<article class="item st-'+s.st+'" data-id="'+esc(l.id)+'">'+
+    '<div class="item-top">'+
+      '<div class="emo" aria-hidden="true">'+esc(l.emoji)+'<span class="tick">✓</span></div>'+
+      '<div class="info"><div class="pname">'+esc(l.product_name)+'</div>'+
+        '<div class="req">'+esc(t("requested"))+': '+esc(fmtQty(l.quantity))+' '+esc(u)+'</div>'+
+        '<div class="chip">'+esc(chip)+'</div></div>'+
+      '<div class="lt">'+esc(price)+'</div>'+
+    '</div>'+
+    (s.note ? '<div class="notebox">💬 '+esc(s.note)+'</div>' : '')+
+    '<div class="acts">'+
+      '<button type="button" class="act done'+(s.st==="listo"?" on":"")+'" data-act="done" data-id="'+esc(l.id)+'">'+esc(t("btnDone"))+'</button>'+
+      '<button type="button" class="act'+(s.st==="cambiado"?" on":"")+'" data-act="change" data-id="'+esc(l.id)+'">'+esc(t("btnChange"))+'</button>'+
+      '<button type="button" class="act no'+(s.st==="nohay"?" on":"")+'" data-act="nohay" data-id="'+esc(l.id)+'">'+esc(t("btnNo"))+'</button>'+
+      '<button type="button" class="act'+(s.note?" on":"")+'" data-act="note" data-id="'+esc(l.id)+'">'+esc(t("btnNote"))+'</button>'+
+    '</div></article>';
+}
+function renderOrder(){
+  const o = view.order, c = o.customer || {};
+  const phone = String(c.phone||"").replace(/[^\d+]/g,"");
+  const dn = o.delivery_notes ? '<div class="dnotes">📝 '+esc(o.delivery_notes)+'</div>' : '';
+  const expanded = $(".addr") && $(".addr").getAttribute("aria-expanded")==="true";
+  app.innerHTML =
+    '<header class="hdr">'+
+      '<div class="hrow">'+
+        '<button class="hbtn" type="button" data-act="back" aria-label="'+esc(t("backToOrders"))+'">←</button>'+
+        '<div class="htitle"><div class="h-id">#'+esc(o.id)+'</div><div class="h-name">'+esc(c.name)+'</div></div>'+
+        (phone ? '<a class="hbtn" href="tel:'+esc(phone)+'" aria-label="'+esc(t("call",c.name||""))+'">📞</a>' : '')+
+      '</div>'+
+      '<div class="hmeta">'+payBadge(o.payment_method)+'<span>'+esc(ageText(o.created_at))+'</span></div>'+
+      (c.address||o.delivery_notes ?
+        '<button class="addr" type="button" data-act="addr" aria-expanded="'+(expanded?"true":"false")+'" title="'+esc(t("tapToExpand"))+'">'+
+          '<span class="addr-body"><span class="addr-text">📍 '+esc(c.address||"")+'</span>'+dn+'</span><span class="chev" aria-hidden="true">▾</span></button>' : '')+
+    '</header>'+
+    '<main class="with-bar" id="lines">'+o.lines.map(itemHTML).join("")+'</main>';
+  const bar = $("#bottomBar"); bar.hidden = false;
+  $("#doneBtn").textContent = t("finish");
+  updateBar();
+}
+function updateBar(){
+  const miss = missingCount();
+  $("#totalAmt").innerHTML = esc(t("total"))+' <b>'+esc(money(totalCents()))+'</b>';
+  $("#totalHint").textContent = miss ? t("missing",miss) : t("allSet");
+  $("#doneBtn").disabled = miss>0;
+}
+function refreshCard(id,focusAct){
+  const l = lineById(id), old = $('.item[data-id="'+String(id).replace(/"/g,'\\"')+'"]');
+  if(!l || !old) return;
+  old.outerHTML = itemHTML(l);
+  updateBar();
+  if(focusAct){
+    const b = $('.item[data-id="'+String(id).replace(/"/g,'\\"')+'"] [data-act="'+focusAct+'"]');
+    if(b) try{ b.focus({preventScroll:true}); }catch(e){}
+  }
+}
+
+/* ---------- Line actions ---------- */
+function actDone(id){
+  const l = lineById(id), s = view.st[id];
+  if(s.st==="listo"){ s.st="pending"; }                // second tap undoes
+  else { s.st="listo"; s.qty=l.quantity; s.sub=""; }
+  view.dirty = true;
+  refreshCard(id,"done");
+}
+
+function openChange(id){
+  const l = lineById(id), s = view.st[id], kg = l.unit==="kg", u = unitLabel(l.unit);
+  const step = kg?5:100, min = kg?5:100, max = kg?9995:99900;
+  const reqU = toU(l.quantity);
+  let cur = toU(s.st==="cambiado" ? s.qty : l.quantity);
+  if(!kg) cur = Math.max(min,Math.round(cur/100)*100);
+  const parse = txt=>{
+    const v = String(txt).trim().replace(",",".");
+    if(!/^\d+(\.\d{1,2})?$/.test(v)) return null;
+    const n = Math.round(parseFloat(v)*100);
+    if(n===reqU) return n;                              // untouched requested amount is always valid
+    if(n<min || n>max) return null;
+    if(kg ? n%5!==0 : n%100!==0) return null;
+    return n;
+  };
+  const sheet = openModal(
+    '<h2 id="mTitle">'+esc(l.emoji)+' '+esc(l.product_name)+'</h2>'+
+    '<p class="sub">'+esc(t("changeTitle"))+' · '+esc(t("changeAsked",fmtQty(l.quantity),u))+'</p>'+
+    '<div class="stepper">'+
+      '<button type="button" class="sbtn" data-m="minus" aria-label="'+esc(t("less"))+'">−</button>'+
+      '<div class="qwrap"><input class="txt" id="qIn" type="text" inputmode="'+(kg?"decimal":"numeric")+'" autocomplete="off" aria-label="'+esc(t("qtyLabel"))+'" value="'+esc(fmtQty(cur/100))+'"><span class="unit">'+esc(u)+'</span></div>'+
+      '<button type="button" class="sbtn" data-m="plus" aria-label="'+esc(t("more"))+'">+</button>'+
+    '</div>'+
+    '<div class="field-err" id="mErr" role="alert"></div>'+
+    '<div class="mact"><button type="button" class="btn sec" data-m="cancel">'+esc(t("cancel"))+'</button>'+
+    '<button type="button" class="btn" data-m="save">'+esc(t("save"))+'</button></div>',
+    {
+      cancel:()=>closeModal(),
+      minus:()=>bump(-step),
+      plus:()=>bump(step),
+      save:()=>{
+        const n = parse(inp.value);
+        if(n===null){ showErr(); return; }
+        s.qty = n/100;
+        s.st = n===reqU ? "listo" : "cambiado";
+        s.sub = "";
+        view.dirty = true;
+        closeModal();
+        refreshCard(id);
+      }
+    });
+  const inp = $("#qIn",sheet), err = $("#mErr",sheet);
+  function showErr(){ err.textContent = kg ? t("errKg") : t("errPza"); inp.classList.add("bad"); }
+  function bump(d){
+    let base = parse(inp.value); if(base===null) base = cur;
+    cur = Math.min(max,Math.max(min,base+d));
+    inp.value = fmtQty(cur/100); err.textContent=""; inp.classList.remove("bad");
+  }
+  inp.addEventListener("input",()=>{
+    const n = parse(inp.value);
+    if(n!==null){ cur=n; err.textContent=""; inp.classList.remove("bad"); }
+  });
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); sheet.querySelector('[data-m="save"]').click(); } });
+  inp.focus(); try{ inp.select(); }catch(e){}
+}
+
+function openNoHay(id){
+  const l = lineById(id), s = view.st[id];
+  let mode = (s.st==="nohay" && !s.sub) ? "remove" : "replace";
+  const sheet = openModal(
+    '<h2 id="mTitle">'+esc(l.emoji)+' '+esc(l.product_name)+'</h2>'+
+    '<p class="sub">'+esc(t("nohayTitle"))+'</p>'+
+    '<label class="opt" id="optReplace"><input type="radio" name="mode" value="replace"><span>'+esc(t("replaceBy"))+'</span></label>'+
+    '<div class="subwrap" id="subWrap"><input class="txt" id="subIn" type="text" maxlength="60" autocomplete="off" placeholder="'+esc(t("replacePh"))+'" aria-label="'+esc(t("replaceBy"))+'" value="'+esc(s.sub)+'"></div>'+
+    '<label class="opt" id="optRemove"><input type="radio" name="mode" value="remove"><span>'+esc(t("removeOpt"))+'</span></label>'+
+    '<div class="field-err" id="mErr" role="alert"></div>'+
+    '<div class="mact"><button type="button" class="btn sec" data-m="cancel">'+esc(t("cancel"))+'</button>'+
+    '<button type="button" class="btn" data-m="save">'+esc(t("save"))+'</button></div>',
+    {
+      cancel:()=>closeModal(),
+      save:()=>{
+        const v = inp.value.trim();
+        if(mode==="replace" && !v){
+          err.textContent = t("errSub"); inp.classList.add("bad"); inp.focus(); return;
+        }
+        s.st = "nohay"; s.sub = mode==="replace" ? v : "";
+        view.dirty = true;
+        closeModal();
+        refreshCard(id);
+      }
+    });
+  const inp = $("#subIn",sheet), err = $("#mErr",sheet);
+  const radios = sheet.querySelectorAll('input[name="mode"]');
+  function setMode(m){
+    mode = m;
+    radios.forEach(r=>{ r.checked = r.value===m; });
+    $("#optReplace",sheet).classList.toggle("sel",m==="replace");
+    $("#optRemove",sheet).classList.toggle("sel",m==="remove");
+    $("#subWrap",sheet).hidden = m!=="replace";
+    err.textContent=""; inp.classList.remove("bad");
+  }
+  radios.forEach(r=>r.addEventListener("change",()=>{ setMode(r.value); if(r.value==="replace") inp.focus(); }));
+  inp.addEventListener("input",()=>{ err.textContent=""; inp.classList.remove("bad"); });
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); sheet.querySelector('[data-m="save"]').click(); } });
+  setMode(mode);
+  if(mode==="replace") inp.focus();
+}
+
+function openNote(id){
+  const l = lineById(id), s = view.st[id];
+  const sheet = openModal(
+    '<h2 id="mTitle">'+esc(l.emoji)+' '+esc(l.product_name)+'</h2>'+
+    '<p class="sub">'+esc(t("noteTitle"))+'</p>'+
+    '<textarea class="txt" id="noteIn" maxlength="200" placeholder="'+esc(t("notePh"))+'" aria-label="'+esc(t("noteTitle"))+'">'+esc(s.note)+'</textarea>'+
+    '<div class="mact"><button type="button" class="btn sec" data-m="cancel">'+esc(t("cancel"))+'</button>'+
+    '<button type="button" class="btn" data-m="save">'+esc(t("save"))+'</button></div>',
+    {
+      cancel:()=>closeModal(),
+      save:()=>{
+        s.note = $("#noteIn",sheet).value.trim();
+        view.dirty = true;
+        closeModal();
+        refreshCard(id);
+      }
+    });
+  $("#noteIn",sheet).focus();
+}
+
+/* ---------- Finish: summary dialog -> submit ---------- */
+function buildResult(employeeNotes){
+  const lines = view.order.lines.map(l=>{
+    const s = view.st[l.id];
+    if(s.st==="nohay") return {id:l.id, picked:-1, substitution:s.sub, note:s.note};
+    const r = {id:l.id, picked:1, quantity: s.st==="cambiado" ? s.qty : l.quantity};
+    if(s.note) r.note = s.note;
+    return r;
+  });
+  return {total_cents:totalCents(), lines, employee_notes:employeeNotes||""};
+}
+function openSummary(){
+  if(missingCount()>0) return;
+  const rows = [];
+  view.order.lines.forEach(l=>{
+    const s = view.st[l.id], u = unitLabel(l.unit);
+    let detail = "";
+    if(s.st==="cambiado") detail = t("sumChanged",fmtQty(l.quantity),fmtQty(s.qty),u);
+    else if(s.st==="nohay") detail = s.sub ? t("sumNoSub",s.sub) : t("sumNoRemove");
+    if(!detail && !s.note) return;
+    rows.push('<div class="sumrow"><b>'+esc(l.emoji)+' '+esc(l.product_name)+'</b>'+
+      (detail?'<div>'+esc(detail)+'</div>':'')+
+      (s.note?'<div class="sn">💬 '+esc(s.note)+'</div>':'')+'</div>');
+  });
+  const total = totalCents();
+  let busy = false;
+  const sheet = openModal(
+    '<h2 id="mTitle">'+esc(t("summaryTitle"))+' #'+esc(view.order.id)+'</h2>'+
+    '<div class="sumbox">'+(rows.length ? rows.join("") : '<div class="sumrow">'+esc(t("nothingAdj"))+'</div>')+'</div>'+
+    '<div class="sumtot"><span>'+esc(t("finalTotal"))+'</span><b>'+esc(money(total))+'</b></div>'+
+    '<label class="lbl" for="empIn">'+esc(t("empNotes"))+'</label>'+
+    '<textarea class="txt" id="empIn" maxlength="300" style="min-height:72px"></textarea>'+
+    '<div class="field-err" id="mErr" role="alert"></div>'+
+    '<div class="mact"><button type="button" class="btn sec" data-m="back">'+esc(t("goBack"))+'</button>'+
+    '<button type="button" class="btn" data-m="ok">'+esc(t("confirm"))+'</button></div>',
+    {
+      back:()=>{ if(!busy) closeModal(); },
+      ok:async()=>{
+        if(busy) return;
+        busy = true;
+        const okBtn = $('[data-m="ok"]',sheet), backBtn = $('[data-m="back"]',sheet), err = $("#mErr",sheet);
+        okBtn.disabled = true; backBtn.disabled = true; okBtn.textContent = t("saving"); err.textContent = "";
+        const orderId = view.order.id;
+        const result = buildResult($("#empIn",sheet).value.trim());
+        try{
+          await sendPicked(orderId,result);
+          view.dirty = false;
+          closeModal(true);
+          showSuccess(orderId,result.total_cents);
+        }catch(e){
+          busy = false;
+          okBtn.disabled = false; backBtn.disabled = false; okBtn.textContent = t("confirm");
+          err.textContent = t("saveErr");
+        }
+      }
+    },
+    ()=>{ if(!busy) closeModal(); });
+  $('[data-m="ok"]',sheet).focus();
+}
+
+function openLeave(){
+  openModal(
+    '<h2 id="mTitle">'+esc(t("leaveTitle"))+'</h2>'+
+    '<p class="sub">'+esc(t("leaveMsg"))+'</p>'+
+    '<div class="mact"><button type="button" class="btn sec" data-m="stay">'+esc(t("stay"))+'</button>'+
+    '<button type="button" class="btn danger" data-m="leave">'+esc(t("leave"))+'</button></div>',
+    { stay:()=>closeModal(), leave:()=>{ closeModal(true); go(null); } });
+}
+
+/* =====================================================================
+   SCREEN C — Success
+   ===================================================================== */
+function showSuccess(orderId,cents){
+  ++nav;
+  closeModal(true);
+  currentOrderId = null; view = null;
+  $("#bottomBar").hidden = true;
+  window.scrollTo(0,0);
+  redraw = ()=>{
+    app.innerHTML = '<section class="success">'+
+      '<h1>'+esc(t("successTitle",orderId))+'</h1>'+
+      '<div class="sl">'+esc(t("finalTotal"))+'</div>'+
+      '<div class="st">'+esc(money(cents))+'</div>'+
+      '<button class="btn" type="button" data-act="to-inbox">'+esc(t("backToOrders"))+'</button></section>';
+  };
+  redraw();
+}
+async function showSuccessForced(orderId){
+  try{
+    forced = null;
+    const orders = orderId ? [await mockLoadOrder(orderId)] : [clone(MOCK_ORDERS[0])];
+    const o = orders[0];
+    showSuccess(o.id, o.lines.reduce((sum,l)=>sum+(l.picked===-1?0:lineCents(l.price_cents,l.quantity)),0));
+  }catch(e){ showInbox(); }
+}
+
+/* =====================================================================
+   Navigation, events, language, init
+   ===================================================================== */
+function go(orderId){
+  try{ history.pushState(null,"",location.pathname+(orderId!=null?"?order="+encodeURIComponent(orderId):"")); }catch(e){}
+  if(forced!=="loading") forced = (forced==="error"||forced==="empty") ? forced : null;
+  if(orderId!=null) showOrder(orderId); else showInbox();
+}
+function routeFromLocation(){
+  const q = new URLSearchParams(location.search);
+  const o = q.get("order");
+  if(forced==="success"){ showSuccessForced(o); return; }
+  if(o) showOrder(o); else showInbox();
+}
+window.addEventListener("popstate",()=>{ forced = null; routeFromLocation(); });
+
+document.addEventListener("click",e=>{
+  const b = e.target.closest("[data-act]");
+  if(!b) return;
+  const act = b.dataset.act, id = b.dataset.id;
+  if(act==="open-order") go(b.dataset.order);
+  else if(act==="to-inbox"){ forced = null; go(null); }
+  else if(act==="back"){ if(view && view.dirty) openLeave(); else go(null); }
+  else if(act==="retry-inbox" || act==="refresh"){ if(forced!=="loading") forced = null; showInbox(); }
+  else if(act==="retry-order"){ showOrder(currentOrderId); }
+  else if(act==="addr"){ b.setAttribute("aria-expanded", b.getAttribute("aria-expanded")==="true" ? "false":"true"); }
+  else if(view){
+    if(act==="done") actDone(id);
+    else if(act==="change") openChange(id);
+    else if(act==="nohay") openNoHay(id);
+    else if(act==="note") openNote(id);
+  }
+});
+$("#doneBtn").addEventListener("click",openSummary);
+
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.title = t("title");
+  const b = $("#langBtn");
+  b.textContent = LANG==="es" ? "EN" : "ES";
+  b.setAttribute("aria-label", t("langAria"));
+  if(view && $("#doneBtn")) $("#doneBtn").textContent = t("finish");
+}
+$("#langBtn").addEventListener("click",()=>{
+  LANG = LANG==="es" ? "en" : "es";
+  applyLang();
+  const y = window.scrollY;
+  redraw();
+  window.scrollTo(0,y);
+});
+
+(function init(){
+  applyLang();
+  const q = new URLSearchParams(location.search);
+  const s = q.get("state");
+  forced = ["loading","error","empty","success"].indexOf(s)>=0 ? s : null;
+  routeFromLocation();
+})();
+</script>
+</body>
+</html>
