@@ -69,7 +69,7 @@
       "cat": "frutas",
       "es": "Papaya",
       "en": "Papaya",
-      "emoji": "🫐",
+      "emoji": "🍈",
       "unit": "kg",
       "price": 35,
       "active": true
@@ -330,7 +330,7 @@
       "cat": "abarrotes",
       "es": "Tortillas de Harina",
       "en": "Flour Tortillas",
-      "emoji": "🫓",
+      "emoji": "🌮",
       "unit": "pza",
       "price": 22,
       "active": true

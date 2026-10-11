@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#2e7d32">
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:,">
@@ -46,18 +46,18 @@
   #langBtn{
     position:fixed;top:10px;right:12px;z-index:60;
     min-width:56px;min-height:48px;
-    background:rgba(255,255,255,.22);
-    border:1px solid rgba(255,255,255,.7);
+    background:rgba(0,0,0,.28);
+    border:1px solid rgba(255,255,255,.35);
     color:#fff;border-radius:24px;
     padding:0 14px;font-size:15px;font-weight:700;
-    text-shadow:0 1px 2px rgba(0,0,0,.25);
+    text-shadow:0 1px 2px rgba(0,0,0,.35);
   }
   #langBtn:active{transform:scale(.95);}
 
   /* ---------- Headers ---------- */
   .hdr{
     position:sticky;top:0;z-index:30;
-    background:linear-gradient(135deg,var(--green) 0%,var(--green-light) 60%,var(--yellow) 130%);
+    background:linear-gradient(135deg,#1b5e20 0%,#256b27 60%,var(--green) 100%);
     color:#fff;
     padding:10px 14px 12px;
     box-shadow:var(--shadow);
@@ -71,17 +71,18 @@
     flex:0 0 auto;
     min-width:48px;min-height:48px;
     display:flex;align-items:center;justify-content:center;
-    background:rgba(255,255,255,.22);
-    border:1px solid rgba(255,255,255,.7);
+    background:rgba(0,0,0,.28);
+    border:1px solid rgba(255,255,255,.35);
     color:#fff;border-radius:24px;
     font-size:22px;font-weight:800;text-decoration:none;padding:0;
   }
   .hbtn:active{transform:scale(.95);}
-  .hmeta{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:15px;font-weight:600;}
+  .hmeta{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:15px;font-weight:700;}
+  .hmeta span:not(.pay){display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,.24);}
   .addr{
     display:flex;align-items:flex-start;gap:8px;width:100%;
     min-height:48px;margin-top:4px;padding:6px 10px;
-    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.45);
+    background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.35);
     border-radius:12px;color:#fff;text-align:left;font-size:15px;line-height:1.35;
   }
   .addr .addr-body{flex:1;min-width:0;align-self:center;}
@@ -151,11 +152,15 @@
     padding:12px;margin-bottom:12px;min-height:96px;box-shadow:var(--shadow);
   }
   .item-top{display:flex;gap:12px;align-items:flex-start;}
-  .emo{position:relative;font-size:46px;line-height:1;flex:0 0 auto;width:58px;text-align:center;}
+  .emo{
+    position:relative;font-size:46px;line-height:1;flex:0 0 58px;
+    width:58px;height:58px;display:flex;align-items:center;justify-content:center;
+    text-align:center;
+  }
   .emo .tick{
     display:none;position:absolute;right:-2px;bottom:-4px;
     width:26px;height:26px;border-radius:50%;
-    background:var(--green);color:#fff;font-size:17px;font-weight:900;line-height:26px;
+    background:var(--green);color:#fff;font-size:17px;font-weight:900;line-height:26px;text-align:center;
   }
   .info{flex:1;min-width:0;}
   .pname{font-size:20px;font-weight:800;overflow-wrap:anywhere;}
@@ -182,7 +187,9 @@
 
   .item.st-listo{background:var(--green-bg);border-color:#a5d6a7;}
   .item.st-listo .emo .tick{display:block;}
-  .item.st-listo .emo,.item.st-listo .pname,.item.st-listo .req,.item.st-listo .lt{opacity:.55;}
+  .item.st-listo .pname{color:#223824;}
+  .item.st-listo .req{color:#4a574b;text-decoration:line-through;}
+  .item.st-listo .lt{color:#4a574b;}
   .item.st-listo .chip{background:var(--green);color:#fff;}
   .item.st-cambiado{background:var(--amber-bg);border-color:var(--yellow);}
   .item.st-cambiado .chip{background:#ffe08a;color:var(--amber-ink);}
@@ -202,7 +209,7 @@
   #totalWrap{flex:0 1 auto;min-width:0;}
   #totalWrap .amt{font-size:15px;font-weight:700;color:var(--muted);white-space:nowrap;}
   #totalWrap .amt b{font-size:24px;font-weight:900;color:var(--green);}
-  #totalWrap .hint{font-size:13px;color:var(--muted);line-height:1.25;}
+  #totalWrap .hint{font-size:15px;color:var(--muted);line-height:1.25;}
   #doneBtn{flex:1;min-height:56px;font-size:17px;}
 
   /* ---------- Dialogs ---------- */
@@ -243,7 +250,7 @@
   .opt.sel{border-color:var(--green);background:var(--green-bg);}
   .subwrap{margin-top:8px;}
   .chosen{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--green-bg);border:2px solid var(--green);font-size:17px;font-weight:800;overflow-wrap:anywhere;}
-  .sublist{margin-top:8px;max-height:32vh;overflow-y:auto;border:2px solid var(--line);border-radius:12px;background:#fff;}
+  .sublist{margin-top:8px;max-height:26vh;overflow-y:auto;border:2px solid var(--line);border-radius:12px;background:#fff;}
   .srow{
     display:flex;align-items:center;gap:10px;width:100%;min-height:56px;
     padding:6px 12px;background:#fff;border:none;border-bottom:1px solid var(--line);
@@ -252,7 +259,7 @@
   .srow:last-child{border-bottom:none;}
   .srow:active{background:#f7f2e6;}
   .srow.sel{background:var(--green-bg);box-shadow:inset 4px 0 0 var(--green);}
-  .srow .sem{font-size:26px;line-height:1;flex:0 0 auto;}
+  .srow .sem{font-size:26px;line-height:1;flex:0 0 32px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
   .srow .sn2{flex:1;min-width:0;overflow-wrap:anywhere;}
   .srow .sp{flex:0 0 auto;font-weight:900;color:var(--green);white-space:nowrap;}
   .srow .sp small{font-size:14px;font-weight:700;color:var(--muted);}
@@ -337,7 +344,7 @@ const T = {
     orderErr:"No se pudo cargar el pedido", orderWord:"Pedido",
     backToOrders:"Volver a pedidos", loading:"Cargando…",
     call:name=>"Llamar a "+name, tapToExpand:"Tocar para ver la dirección completa",
-    requested:"Pedido", pending:"Pendiente",
+    requested:"Solicitado", pending:"Pendiente",
     btnDone:"✓ Listo", btnChange:"⚖ Cambiar", btnNo:"✗ No hay", btnNote:"💬 Nota",
     stDone:"✓ Listo",
     stChanged:(q,u)=>"⚖ Cambiado: "+q+" "+u,
@@ -349,10 +356,10 @@ const T = {
     finish:"Listo para facturar",
     changeTitle:"Cambiar cantidad", changeAsked:(q,u)=>"Pedido: "+q+" "+u,
     less:"Disminuir", more:"Aumentar", qtyLabel:"Cantidad",
-    errKg:"Escribe un peso válido en kilos (de 0.05 en 0.05, por ejemplo 1.35).",
+    errKg:"Escribe la cantidad en kilos (pasos de 0.05, por ejemplo 1.35).",
     errPza:"Escribe un número entero de piezas, mayor a 0.",
     save:"Guardar", cancel:"Cancelar",
-    nohayTitle:"No hay este producto", replaceBy:"Reemplazar por…", replacePh:"Buscar producto (ej. platano)",
+    nohayTitle:"No hay este producto", replaceBy:"Reemplazar por…", replacePh:"Buscar producto (ej. plátano)",
     removeOpt:"Quitar del pedido", noResults:"Sin resultados", catErr:"No se pudo cargar el catálogo.",
     subChosen:(n,p,u)=>"✓ "+n+" · "+money(p)+(u?" / "+u:""),
     noteTitle:"Nota", notePh:"Ej. está muy maduro",
@@ -377,7 +384,7 @@ const T = {
     orderErr:"Could not load the order", orderWord:"Order",
     backToOrders:"Back to orders", loading:"Loading…",
     call:name=>"Call "+name, tapToExpand:"Tap to see the full address",
-    requested:"Ordered", pending:"Pending",
+    requested:"Requested", pending:"Pending",
     btnDone:"✓ Done", btnChange:"⚖ Change", btnNo:"✗ Out of stock", btnNote:"💬 Note",
     stDone:"✓ Done",
     stChanged:(q,u)=>"⚖ Changed: "+q+" "+u,
@@ -472,7 +479,7 @@ const MOCK_ORDERS = [
       { id:22, product_name:"Limón",              emoji:"🍋", unit:"kg",  price_cents:3500, quantity:0.5, picked:0 },
       { id:23, product_name:"Cilantro",           emoji:"🌿", unit:"pza", price_cents:1000, quantity:2,   picked:0 },
       { id:24, product_name:"Piña",               emoji:"🍍", unit:"kg",  price_cents:3000, quantity:1.5, picked:-1, substitution:"Mango Ataulfo", substitution_unit:"kg", substitution_price_cents:5500 },
-      { id:25, product_name:"Tortillas de Harina",emoji:"🫓", unit:"pza", price_cents:2200, quantity:2,   picked:0 }
+      { id:25, product_name:"Tortillas de Harina",emoji:"🌮", unit:"pza", price_cents:2200, quantity:2,   picked:0 }
     ]
   },
   { /* clean */
@@ -512,7 +519,7 @@ const MOCK_CATALOG = [
   { name:"Aguacate",            unit:"kg",  price_cents:6500, emoji:"🥑", cat:"frutas" },
   { name:"Plátano",             unit:"kg",  price_cents:2200, emoji:"🍌", cat:"frutas" },
   { name:"Mango Ataulfo",       unit:"kg",  price_cents:5500, emoji:"🥭", cat:"frutas" },
-  { name:"Papaya",              unit:"kg",  price_cents:3500, emoji:"🫐", cat:"frutas" },
+  { name:"Papaya",              unit:"kg",  price_cents:3500, emoji:"🍈", cat:"frutas" },
   { name:"Piña",                unit:"kg",  price_cents:3000, emoji:"🍍", cat:"frutas" },
   { name:"Fresa",               unit:"kg",  price_cents:8000, emoji:"🍓", cat:"frutas" },
   { name:"Cilantro",            unit:"pza", price_cents:1000, emoji:"🌿", cat:"verduras" },
@@ -520,7 +527,7 @@ const MOCK_CATALOG = [
   { name:"Zanahoria",           unit:"kg",  price_cents:2800, emoji:"🥕", cat:"verduras" },
   { name:"Leche Lala 1L",       unit:"pza", price_cents:2800, emoji:"🥛", cat:"lacteos" },
   { name:"Yogurt Natural",      unit:"pza", price_cents:2500, emoji:"🥣", cat:"lacteos" },
-  { name:"Tortillas de Harina", unit:"pza", price_cents:2200, emoji:"🫓", cat:"abarrotes" },
+  { name:"Tortillas de Harina", unit:"pza", price_cents:2200, emoji:"🌮", cat:"abarrotes" },
   { name:"Arroz",               unit:"kg",  price_cents:2400, emoji:"🍚", cat:"abarrotes" },
   { name:"Agua Bonafont 1L",    unit:"pza", price_cents:1500, emoji:"💧", cat:"bebidas" },
   { name:"Jamaica 1L",          unit:"pza", price_cents:2200, emoji:"🌺", cat:"bebidas" },
@@ -597,6 +604,29 @@ let nav = 0;                 // navigation token: ignore stale async results
 let redraw = function(){};   // re-renders the current screen (used by language toggle)
 let view = null;             // order screen: {order, st:{lineId:{st,qty,sub,note}}, dirty}
 let currentOrderId = null;
+const SS_KEY = "picker_working_state";
+let savedState = null;
+function saveSnapshot(){
+  if(!view || !view.order) return;
+  try{
+    savedState = {
+      orderId: view.order.id,
+      dirty: !!view.dirty,
+      st: view.st
+    };
+    sessionStorage.setItem(SS_KEY, JSON.stringify(savedState));
+  }catch(e){}
+}
+function clearSnapshot(){
+  savedState = null;
+  try{ sessionStorage.removeItem(SS_KEY); }catch(e){}
+}
+function loadSavedSnapshot(){
+  try{
+    const raw = sessionStorage.getItem(SS_KEY);
+    savedState = raw ? JSON.parse(raw) : null;
+  }catch(e){ savedState = null; }
+}
 
 /* Line state: st = "pending" | "listo" | "cambiado" | "nohay" */
 function initLine(l){
@@ -722,9 +752,17 @@ async function showOrder(orderId){
   try{
     const order = await fetchOrder(orderId);
     if(tok!==nav) return;
+    loadSavedSnapshot();
     const st = {};
     order.lines.forEach(l=>{ st[l.id] = initLine(l); });
-    view = {order, st, dirty:false};
+    let dirty = false;
+    if(savedState && String(savedState.orderId)===String(orderId) && savedState.st){
+      order.lines.forEach(l=>{
+        if(savedState.st[l.id]) st[l.id] = savedState.st[l.id];
+      });
+      dirty = !!savedState.dirty;
+    }
+    view = {order, st, dirty};
     status = "ok";
   }catch(e){
     if(tok!==nav) return;
@@ -802,6 +840,7 @@ function actDone(id){
   if(s.st==="listo"){ s.st="pending"; }                // second tap undoes
   else { s.st="listo"; s.qty=l.quantity; s.sub=""; s.subPrice=null; s.subUnit=""; }
   view.dirty = true;
+  saveSnapshot();
   refreshCard(id,"done");
 }
 
@@ -842,6 +881,7 @@ function openChange(id){
         s.st = n===reqU ? "listo" : "cambiado";
         s.sub = ""; s.subPrice = null; s.subUnit = "";
         view.dirty = true;
+        saveSnapshot();
         closeModal();
         refreshCard(id);
       }
@@ -890,6 +930,7 @@ function openNoHay(id){
         chosen = p;
         sheet.querySelectorAll(".srow").forEach(r=>r.classList.toggle("sel",r===b));
         drawChosen(); updateSave();
+        try{ b.scrollIntoView({block:"nearest",behavior:"smooth"}); }catch(e){}
       },
       save:()=>{
         if(!canSave()) return;
@@ -897,6 +938,7 @@ function openNoHay(id){
         if(mode==="replace"){ s.sub = chosen.name; s.subPrice = chosen.price_cents; s.subUnit = chosen.unit||""; }
         else { s.sub = ""; s.subPrice = null; s.subUnit = ""; }
         view.dirty = true;
+        saveSnapshot();
         closeModal();
         refreshCard(id);
       }
@@ -909,7 +951,10 @@ function openNoHay(id){
   function drawChosen(){
     const box = $("#subChosen",sheet);
     box.hidden = !chosen;
-    if(chosen) box.textContent = t("subChosen",chosen.name,chosen.price_cents,chosen.unit?unitLabel(chosen.unit):"");
+    if(chosen){
+      box.textContent = t("subChosen",chosen.name,chosen.price_cents,chosen.unit?unitLabel(chosen.unit):"");
+      try{ box.scrollIntoView({block:"nearest",behavior:"smooth"}); }catch(e){}
+    }
   }
   function drawList(){
     const box = $("#subList",sheet);
@@ -925,6 +970,10 @@ function openNoHay(id){
         '<span class="sem" aria-hidden="true">'+esc(p.emoji)+'</span><span class="sn2">'+esc(p.name)+'</span>'+
         '<span class="sp">'+esc(money(p.price_cents))+(p.unit?'<small> / '+esc(unitLabel(p.unit))+'</small>':'')+'</span></button>'
     ).join("") : '<div class="sempty">'+esc(t("noResults"))+'</div>';
+    if(chosen){
+      const sel = box.querySelector(".srow.sel");
+      if(sel) try{ sel.scrollIntoView({block:"nearest"}); }catch(e){}
+    }
   }
   async function loadCat(){
     cstat = "loading"; drawList();
@@ -941,13 +990,14 @@ function openNoHay(id){
     $("#subWrap",sheet).hidden = m!=="replace";
     updateSave();
   }
-  radios.forEach(r=>r.addEventListener("change",()=>{ setMode(r.value); if(r.value==="replace") inp.focus(); }));
+  radios.forEach(r=>r.addEventListener("change",()=>{ setMode(r.value); if(r.value==="replace") inp.focus({preventScroll:true}); }));
+  inp.addEventListener("focus",()=>{ try{ inp.scrollIntoView({block:"nearest",behavior:"smooth"}); }catch(e){} });
   inp.addEventListener("input",()=>{ if(cstat==="ok") drawList(); });
   inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); sheet.querySelector('[data-m="save"]').click(); } });
   drawChosen();
   setMode(mode);
   loadCat();
-  if(mode==="replace") inp.focus();
+  if(mode==="replace") inp.focus({preventScroll:true});
 }
 
 function openNote(id){
@@ -963,6 +1013,7 @@ function openNote(id){
       save:()=>{
         s.note = $("#noteIn",sheet).value.trim();
         view.dirty = true;
+        saveSnapshot();
         closeModal();
         refreshCard(id);
       }
@@ -1017,6 +1068,7 @@ function openSummary(){
         try{
           await sendPicked(orderId,result);
           view.dirty = false;
+          clearSnapshot();
           closeModal(true);
           showSuccess(orderId,result.total_cents);
         }catch(e){
@@ -1036,7 +1088,15 @@ function openLeave(){
     '<p class="sub">'+esc(t("leaveMsg"))+'</p>'+
     '<div class="mact"><button type="button" class="btn sec" data-m="stay">'+esc(t("stay"))+'</button>'+
     '<button type="button" class="btn danger" data-m="leave">'+esc(t("leave"))+'</button></div>',
-    { stay:()=>closeModal(), leave:()=>{ closeModal(true); go(null); } });
+    {
+      stay:()=>closeModal(),
+      leave:()=>{
+        closeModal(true);
+        if(view) view.dirty = false;
+        clearSnapshot();
+        go(null);
+      }
+    });
 }
 
 /* =====================================================================
@@ -1080,7 +1140,15 @@ function routeFromLocation(){
   if(forced==="success"){ showSuccessForced(o); return; }
   if(o) showOrder(o); else showInbox();
 }
-window.addEventListener("popstate",()=>{ forced = null; routeFromLocation(); });
+window.addEventListener("popstate",()=>{
+  forced = null;
+  if(view && view.dirty){
+    try{ history.pushState(null,"",location.pathname+(currentOrderId!=null?"?order="+encodeURIComponent(currentOrderId):"")); }catch(e){}
+    openLeave();
+    return;
+  }
+  routeFromLocation();
+});
 
 document.addEventListener("click",e=>{
   const b = e.target.closest("[data-act]");
@@ -1119,6 +1187,7 @@ $("#langBtn").addEventListener("click",()=>{
 
 (function init(){
   applyLang();
+  loadSavedSnapshot();
   const q = new URLSearchParams(location.search);
   const s = q.get("state");
   forced = ["loading","error","empty","success"].indexOf(s)>=0 ? s : null;
