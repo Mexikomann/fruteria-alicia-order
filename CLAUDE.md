@@ -40,6 +40,7 @@ payment processing, no server. Cash-first by design.
 | `products.json` | Catalog data contract | **NO** — read to understand the schema |
 | `docs/admin-panel-spec.md` | **Full spec for the admin panel — READ THIS FIRST** | No |
 | `admin.html` | The store-owner admin panel | **YES — this is what you create** |
+| `picker.html` | Employee packing screen — **already built**, ES-first, four line states, wired to mock data | Yes, but only when a task names it; its own spec (`docs/picker-spec.md`, amended by `docs/picker-amendment-1.md`) governs it |
 | `og-image.png` | WhatsApp link preview image | No |
 
 ## Your job
