@@ -1,0 +1,19 @@
+{
+  "name": "Fruteria Alicia · Pedidos",
+  "short_name": "Alicia",
+  "description": "Pide frutas, verduras, lácteos y más a domicilio en Mazatlán. Pedido por WhatsApp.",
+  "lang": "es-MX",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fffef7",
+  "theme_color": "#2e7d32",
+  "categories": ["food", "shopping"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
